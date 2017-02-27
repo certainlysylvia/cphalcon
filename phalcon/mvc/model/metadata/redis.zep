@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Mvc\Model\MetaData;
 
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\MetaDataInterface;
 use Phalcon\Cache\Backend\Redis;
 use Phalcon\Cache\Frontend\Data as FrontendData;
 
@@ -31,23 +30,29 @@ use Phalcon\Cache\Frontend\Data as FrontendData;
  *
  * By default meta-data is stored for 48 hours (172800 seconds)
  *
- *
  *<code>
- *	$metaData = new Phalcon\Mvc\Model\Metadata\Redis(array(
- *		'prefix' => 'my-app-id',
- *		'lifetime' => 86400,
- *		'host' => 'localhost',
- *		'port' => 6379,
- *  	'persistent' => false
- *	));
+ * use Phalcon\Mvc\Model\Metadata\Redis;
+ *
+ * $metaData = new Redis(
+ *     [
+ *         "host"       => "127.0.0.1",
+ *         "port"       => 6379,
+ *         "persistent" => 0,
+ *         "statsKey"   => "_PHCM_MM",
+ *         "lifetime"   => 172800,
+ *         "index"      => 2,
+ *     ]
+ * );
  *</code>
  */
-class Redis extends MetaData implements MetaDataInterface
+class Redis extends MetaData
 {
 
 	protected _ttl = 172800;
 
 	protected _redis = null;
+
+	protected _metaData = [];
 
 	/**
 	 * Phalcon\Mvc\Model\MetaData\Redis constructor
@@ -86,8 +91,6 @@ class Redis extends MetaData implements MetaDataInterface
 			new FrontendData(["lifetime": this->_ttl]),
 			options
 		);
-
-		let this->_metaData = [];
 	}
 
 	/**

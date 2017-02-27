@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -30,9 +30,10 @@ use Phalcon\Di\InjectionAwareInterface;
  * you can easily create groups of session variables into the application
  *
  *<code>
- *	$user = new \Phalcon\Session\Bag('user');
- *	$user->name = "Kimbra Johnson";
- *	$user->age  = 22;
+ * $user = new \Phalcon\Session\Bag("user");
+ *
+ * $user->name = "Kimbra Johnson";
+ * $user->age  = 22;
  *</code>
  */
 class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, \ArrayAccess, \Countable
@@ -73,7 +74,8 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	}
 
 	/**
-	 * Initializes the session bag. This method must not be called directly, the class calls it when its internal data is accesed
+	 * Initializes the session bag. This method must not be called directly, the
+	 * class calls it when its internal data is accessed
 	 */
 	public function initialize()
 	{
@@ -104,7 +106,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	}
 
 	/**
-	 * Destroyes the session bag
+	 * Destroys the session bag
 	 *
 	 *<code>
 	 * $user->destroy();
@@ -123,7 +125,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Sets a value in the session bag
 	 *
 	 *<code>
-	 * $user->set('name', 'Kimbra');
+	 * $user->set("name", "Kimbra");
 	 *</code>
 	 */
 	public function set(string! property, var value)
@@ -152,7 +154,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Obtains a value from the session bag optionally setting a default value
 	 *
 	 *<code>
-	 * echo $user->get('name', 'Kimbra');
+	 * echo $user->get("name", "Kimbra");
 	 *</code>
 	 */
 	public function get(string! property, var defaultValue = null)
@@ -183,7 +185,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * echo $user->name;
 	 *</code>
 	 */
-	public function __get(string! property)
+	public function __get(string! property) -> var
 	{
 		return this->get(property);
 	}
@@ -192,7 +194,9 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Check whether a property is defined in the internal bag
 	 *
 	 *<code>
-	 * var_dump($user->has('name'));
+	 * var_dump(
+	 *     $user->has("name")
+	 * );
 	 *</code>
 	 */
 	public function has(string! property) -> boolean
@@ -208,7 +212,9 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Magic isset to check whether a property is defined in the bag
 	 *
 	 *<code>
-	 * var_dump(isset($user['name']));
+	 * var_dump(
+	 *     isset($user["name"])
+	 * );
 	 *</code>
 	 */
 	public function __isset(string! property) -> boolean
@@ -220,7 +226,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Removes a property from the internal bag
 	 *
 	 *<code>
-	 * $user->remove('name');
+	 * $user->remove("name");
 	 *</code>
 	 */
 	public function remove(string! property) -> boolean
@@ -242,7 +248,7 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 	 * Magic unset to remove items using the array syntax
 	 *
 	 *<code>
-	 * unset($user['name']);
+	 * unset($user["name"]);
 	 *</code>
 	 */
 	public function __unset(string! property) -> boolean
@@ -267,10 +273,8 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 
 	/**
 	 * Returns the bag iterator
-	 *
-	 * @return \ArrayIterator
 	 */
-	public final function getIterator()
+	public final function getIterator() -> <\ArrayIterator>
 	{
 		if this->_initialized === false {
 			this->initialize();
@@ -279,35 +283,22 @@ class Bag implements InjectionAwareInterface, BagInterface, \IteratorAggregate, 
 		return new \ArrayIterator(this->_data);
 	}
 
-	/**
-	 * @param string property
-	 * @param mixed value
-	 */
 	public final function offsetSet(string! property, var value)
 	{
 		return this->set(property, value);
 	}
 
-	/**
-	 * @param string property
-	 */
-	public final function offsetExists(string! property)
+	public final function offsetExists(string! property) -> boolean
 	{
 		return this->has(property);
 	}
 
-	/**
-	 * @param string property
-	 */
 	public final function offsetUnset(string! property)
 	{
 		return this->remove(property);
 	}
 
-	/**
-	 * @param string property
-	 */
-	public final function offsetGet(string! property)
+	public final function offsetGet(string! property) -> var
 	{
 		return this->get(property);
 	}

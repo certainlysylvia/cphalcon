@@ -30,9 +30,11 @@
  * You can query the meta-data by printing $_SESSION['$PMM$']
  *
  *<code>
- * $metaData = new \Phalcon\Mvc\Model\Metadata\Session(array(
- *    'prefix' => 'my-app-id'
- * ));
+ * $metaData = new \Phalcon\Mvc\Model\Metadata\Session(
+ *     [
+ *        "prefix" => "my-app-id",
+ *     ]
+ * );
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session) {
@@ -41,7 +43,6 @@ ZEPHIR_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session) {
 
 	zend_declare_property_string(phalcon_mvc_model_metadata_session_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
 
-	zend_class_implements(phalcon_mvc_model_metadata_session_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
 	return SUCCESS;
 
 }
@@ -53,7 +54,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct) {
 
-	zval *options = NULL, *prefix;
+	zval *options = NULL, *prefix = NULL;
 
 	zephir_fetch_params(0, 0, 1, &options);
 
@@ -78,7 +79,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read) {
 
-	zval *key_param = NULL, *metaData, *_SESSION, *_0, *_1, *_2;
+	zval *key_param = NULL, *_SESSION, *metaData = NULL, *_0, *_1, *_2;
 	zval *key = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -89,7 +90,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read) {
 	_1 = zephir_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY_CC);
 	ZEPHIR_INIT_VAR(_2);
 	ZEPHIR_CONCAT_SV(_2, "$PMM$", _1);
-	zephir_array_fetch(&_0, _SESSION, _2, PH_READONLY, "phalcon/mvc/model/metadata/session.zep", 70 TSRMLS_CC);
+	zephir_array_fetch(&_0, _SESSION, _2, PH_READONLY, "phalcon/mvc/model/metadata/session.zep", 71 TSRMLS_CC);
 	if (zephir_array_isset_fetch(&metaData, _0, key, 1 TSRMLS_CC)) {
 		RETURN_CTOR(metaData);
 	}
@@ -128,7 +128,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {

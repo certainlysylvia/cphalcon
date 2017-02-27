@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 
 namespace Phalcon\Cli;
 
-use Phalcon\Cli\Task;
 use Phalcon\Events\ManagerInterface;
 use Phalcon\Cli\Dispatcher\Exception;
 
@@ -32,22 +31,20 @@ use Phalcon\Cli\Dispatcher\Exception;
  * instantiating a task and calling an action on it.
  *
  *<code>
+ * $di = new \Phalcon\Di();
  *
- *	$di = new \Phalcon\Di();
+ * $dispatcher = new \Phalcon\Cli\Dispatcher();
  *
- *	$dispatcher = new \Phalcon\Cli\Dispatcher();
+ * $dispatcher->setDi($di);
  *
- *  $dispatcher->setDi(di);
+ * $dispatcher->setTaskName("posts");
+ * $dispatcher->setActionName("index");
+ * $dispatcher->setParams([]);
  *
- *	$dispatcher->setTaskName('posts');
- *	$dispatcher->setActionName('index');
- *	$dispatcher->setParams(array());
- *
- *	$handle = dispatcher->dispatch();
- *
+ * $handle = $dispatcher->dispatch();
  *</code>
  */
-class Dispatcher extends \Phalcon\Dispatcher
+class Dispatcher extends \Phalcon\Dispatcher implements DispatcherInterface
 {
 
 	protected _handlerSuffix = "Task";
@@ -56,17 +53,7 @@ class Dispatcher extends \Phalcon\Dispatcher
 
 	protected _defaultAction = "main";
 
-	protected _options;
-
-	/**
-	 * Phalcon\Cli\Dispatcher constructor
-	 */
-	public function __construct()
-	{
-		let this->_options = [];
-
-		parent::__construct();
-	}
+	protected _options = [];
 
 	/**
 	 * Sets the default task suffix
@@ -131,9 +118,9 @@ class Dispatcher extends \Phalcon\Dispatcher
 	}
 
 	/**
-	 * Returns the lastest dispatched controller
+	 * Returns the latest dispatched controller
 	 */
-	public function getLastTask() -> <Task>
+	public function getLastTask() -> <TaskInterface>
 	{
 		return this->_lastHandler;
 	}
@@ -141,7 +128,7 @@ class Dispatcher extends \Phalcon\Dispatcher
 	/**
 	 * Returns the active task in the dispatcher
 	 */
-	public function getActiveTask() -> <Task>
+	public function getActiveTask() -> <TaskInterface>
 	{
 		return this->_activeHandler;
 	}
@@ -160,5 +147,10 @@ class Dispatcher extends \Phalcon\Dispatcher
 	public function getOptions() -> array
 	{
 		return this->_options;
+	}
+
+	public function callActionMethod(handler, string actionMethod, array! params = [])
+	{
+		return call_user_func_array([handler, actionMethod], [params]);
 	}
 }

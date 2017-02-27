@@ -549,33 +549,6 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 
 		$connection = new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
 
-		//List tables
-		$expectedTables = array (
-			'albums',
-			'artists',
-			'customers',
-			'issue_1534',
-			'issue_2019',
-			'm2m_parts',
-			'm2m_robots',
-			'm2m_robots_parts',
-			'parts',
-			'personas',
-			'personnes',
-			'prueba',
-			'robots',
-			'robots_parts',
-			'songs',
-			'subscriptores',
-			'tipo_documento',
-		);
-
-		$tables = $connection->listTables();
-		$this->assertEquals($tables, $expectedTables);
-
-		$tables = $connection->listTables('phalcon_test');
-		$this->assertEquals($tables, $expectedTables);
-
 		//Table exist
 		$this->assertEquals($connection->tableExists('personas'), 1);
 		$this->assertEquals($connection->tableExists('noexist'), 0);
@@ -605,7 +578,8 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 		$expectedIndexes = array(
 			'PRIMARY' => Phalcon\Db\Index::__set_state(array(
 				'_name' => 'PRIMARY',
-				'_columns' => array('id')
+				'_columns' => array('id'),
+				'_type' => 'PRIMARY',
 			)),
 			'robots_id' => Phalcon\Db\Index::__set_state(array(
 				'_name' => 'robots_id',
@@ -623,6 +597,26 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 		$describeIndexes = $connection->describeIndexes('robots_parts', 'phalcon_test');
 		$this->assertEquals($describeIndexes, $expectedIndexes);
 
+		//Indexes
+		$expectedIndexes = array(
+			'PRIMARY' => Phalcon\Db\Index::__set_state(array(
+				'_name' => 'PRIMARY',
+				'_columns' => array('id'),
+				'_type' => 'PRIMARY',
+			)),
+			'issue_11036_token_UNIQUE' => Phalcon\Db\Index::__set_state(array(
+				'_name' => 'issue_11036_token_UNIQUE',
+				'_columns' => array('token'),
+				'_type' => 'UNIQUE'
+			))
+		);
+
+		$describeIndexes = $connection->describeIndexes('issue_11036');
+		$this->assertEquals($describeIndexes, $expectedIndexes);
+
+		$describeIndexes = $connection->describeIndexes('issue_11036', 'phalcon_test');
+		$this->assertEquals($describeIndexes, $expectedIndexes);
+
 		//References
 		$expectedReferences = array(
 			'robots_parts_ibfk_1' => Phalcon\Db\Reference::__set_state(array(
@@ -630,7 +624,9 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 			'_referencedTable' => 'robots',
 			'_columns' => array('robots_id'),
 				'_referencedColumns' => array('id'),
-				'_referencedSchema' => 'phalcon_test'
+				'_referencedSchema' => 'phalcon_test',
+				'_onUpdate' => 'RESTRICT',
+				'_onDelete' => 'RESTRICT'
 			)),
 			'robots_parts_ibfk_2' => Phalcon\Db\Reference::__set_state(array(
 				'_referenceName' => 'robots_parts_ibfk_2',
@@ -638,6 +634,8 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 				'_columns' => array('parts_id'),
 				'_referencedColumns' => array('id'),
 				'_referencedSchema' => 'phalcon_test',
+				'_onUpdate' => 'RESTRICT',
+				'_onDelete' => 'RESTRICT'
 			)),
 		);
 
@@ -651,7 +649,6 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 
 	public function testDbPostgresql()
 	{
-
 		require 'unit-tests/config.db.php';
 		if (empty($configPostgresql)) {
 			$this->markTestSkipped("Skipped");
@@ -659,31 +656,6 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 		}
 
 		$connection = new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
-
-		//List tables
-		$expectedTables = array (
-			0 => 'customers',
-			1 => 'parts',
-			2 => 'personas',
-			3 => 'personnes',
-			4 => 'prueba',
-			5 => 'robots',
-			6 => 'robots_parts',
-			7 => 'subscriptores',
-			8 => 'tipo_documento',
-		);
-
-		$tables = $connection->listTables();
-		$this->assertEquals($tables, $expectedTables);
-
-		$tables = $connection->listTables('public');
-		$this->assertEquals($tables, $expectedTables);
-
-		//Table exist
-		$this->assertEquals($connection->tableExists('personas'), 1);
-		$this->assertEquals($connection->tableExists('noexist'), 0);
-		$this->assertEquals($connection->tableExists('personas', 'public'), 1);
-		$this->assertEquals($connection->tableExists('personas', 'test'), 0);
 
 		//Columns
 		$expectedDescribe = $this->getExpectedColumnsPostgresql();
@@ -755,22 +727,24 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 
 		//List tables
 		$expectedTables = array (
-			0 => 'customers',
-			1 => 'm2m_parts',
-			2 => 'm2m_robots',
-			3 => 'm2m_robots_parts',
-			4 => 'parts',
-			5 => 'personas',
-			6 => 'personnes',
-			7 => 'prueba',
-			8 => 'robots',
-			9 => 'robots_parts',
-			10 => 'sqlite_sequence',
-			11 => 'subscriptores',
-			12 => 'tipo_documento',
+			0 => 'COMPANY',
+			1 => 'customers',
+			2 => 'm2m_parts',
+			3 => 'm2m_robots',
+			4 => 'm2m_robots_parts',
+			5 => 'parts',
+			6 => 'personas',
+			7 => 'personnes',
+			8 => 'prueba',
+			9 => 'robots',
+			10 => 'robots_parts',
+			11 => 'sqlite_sequence',
+			12 => 'subscriptores',
+			13 => 'tipo_documento',
 		);
 
 		$tables = $connection->listTables();
+
 		$this->assertEquals($tables, $expectedTables);
 
 		$tables = $connection->listTables('public');
@@ -790,22 +764,28 @@ class DbDescribeTest extends PHPUnit_Framework_TestCase
 		$describe = $connection->describeColumns('personas', 'main');
 		$this->assertEquals($describe, $expectedDescribe);
 
-		//Indexes ps. sqlite's integer primary key autoincrement is not listed in indexes
+		//Indexes
 		$expectedIndexes = array(
-			'robots_parts_parts_id' => Phalcon\Db\Index::__set_state(array(
-				'_name' => 'robots_parts_parts_id',
-				'_columns' => array('parts_id')
+			'sqlite_autoindex_COMPANY_1' => Phalcon\Db\Index::__set_state(array(
+				'_name' => 'sqlite_autoindex_COMPANY_1',
+				'_columns' => array('ID'),
+				'_type' => 'PRIMARY'
 			)),
-			'robots_parts_robots_id' => Phalcon\Db\Index::__set_state(array(
-				'_name' => 'robots_parts_robots_id',
-				'_columns' => array('robots_id')
+			'salary_index' => Phalcon\Db\Index::__set_state(array(
+				'_name' => 'salary_index',
+				'_columns' => array('SALARY')
+			)),
+			'name_index' => Phalcon\Db\Index::__set_state(array(
+				'_name' => 'name_index',
+				'_columns' => array('NAME'),
+				'_type' => 'UNIQUE'
 			))
 		);
 
-		$describeIndexes = $connection->describeIndexes('robots_parts');
+		$describeIndexes = $connection->describeIndexes('COMPANY');
 		$this->assertEquals($describeIndexes, $expectedIndexes);
 
-		$describeIndexes = $connection->describeIndexes('robots_parts', 'main');
+		$describeIndexes = $connection->describeIndexes('company', 'main');
 		$this->assertEquals($describeIndexes, $expectedIndexes);
 
 		//References

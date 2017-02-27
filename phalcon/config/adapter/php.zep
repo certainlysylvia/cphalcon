@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -30,26 +30,28 @@ use Phalcon\Config;
  *
  *<code>
  *<?php
- *return array(
- * 'database' => array(
- *     'adapter' => 'Mysql',
- *     'host' => 'localhost',
- *     'username' => 'scott',
- *     'password' => 'cheetah',
- *     'dbname' => 'test_db'
- * ),
  *
- * 'phalcon' => array(
- *    'controllersDir' => '../app/controllers/',
- *    'modelsDir' => '../app/models/',
- *    'viewsDir' => '../app/views/'
- *));
+ * return [
+ *     "database" => [
+ *         "adapter"  => "Mysql",
+ *         "host"     => "localhost",
+ *         "username" => "scott",
+ *         "password" => "cheetah",
+ *         "dbname"   => "test_db",
+ *     ],
+ *     "phalcon" => [
+ *         "controllersDir" => "../app/controllers/",
+ *         "modelsDir"      => "../app/models/",
+ *         "viewsDir"       => "../app/views/",
+ *     ],
+ * ];
  *</code>
  *
  * You can read it as follows:
  *
  *<code>
- * $config = new Phalcon\Config\Adapter\Php("path/config.php");
+ * $config = new \Phalcon\Config\Adapter\Php("path/config.php");
+ *
  * echo $config->phalcon->controllersDir;
  * echo $config->database->username;
  *</code>

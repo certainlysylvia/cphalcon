@@ -24,17 +24,20 @@
 /**
  * Phalcon\Paginator\Adapter\Model
  *
- * This adapter allows to paginate data using a Phalcon\Mvc\Model resultset as a base
- *<code>
- *	$paginator = new \Phalcon\Paginator\Adapter\Model(
- *		array(
- *			"data"  => Robots::find(),
- *			"limit" => 25,
- *			"page"  => $currentPage
- *		)
- *	);
+ * This adapter allows to paginate data using a Phalcon\Mvc\Model resultset as a base.
  *
- *  $paginate = $paginator->getPaginate();
+ * <code>
+ * use Phalcon\Paginator\Adapter\Model;
+ *
+ * $paginator = new Model(
+ *     [
+ *         "data"  => Robots::find(),
+ *         "limit" => 25,
+ *         "page"  => $currentPage,
+ *     ]
+ * );
+ *
+ * $paginate = $paginator->getPaginate();
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_Model) {
@@ -46,7 +49,6 @@ ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_Model) {
 	 */
 	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_config"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
-	zend_class_implements(phalcon_paginator_adapter_model_ce TSRMLS_CC, 1, phalcon_paginator_adapterinterface_ce);
 	return SUCCESS;
 
 }
@@ -56,13 +58,12 @@ ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_Model) {
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct) {
 
-	zval *config_param = NULL, *page, *limit;
+	zval *config_param = NULL, *page = NULL, *limit = NULL;
 	zval *config = NULL;
 
 	zephir_fetch_params(0, 1, 0, &config_param);
 
 	config = config_param;
-
 
 
 	zephir_update_property_this(this_ptr, SL("_config"), config TSRMLS_CC);
@@ -80,9 +81,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct) {
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate) {
 
-	zephir_fcall_cache_entry *_5 = NULL, *_6 = NULL;
-	int pageNumber, show, n, start, lastShowPage, i, next, totalPages, before, ZEPHIR_LAST_CALL_STATUS;
-	zval *config, *items, *pageItems, *page, *_0, *_1, *_2 = NULL, *_3 = NULL, *_4 = NULL, *_7;
+	zval *config = NULL, *items = NULL, *pageItems = NULL, *page = NULL, *_0, *_1, *_8, *_2$$9, *_3$$10, *_4$$8 = NULL, *_5$$11 = NULL;
+	zephir_fcall_cache_entry *_6 = NULL, *_7 = NULL;
+	int ZEPHIR_LAST_CALL_STATUS, pageNumber = 0, show = 0, n = 0, start = 0, lastShowPage = 0, i = 0, next = 0, totalPages = 0, before = 0;
 
 	ZEPHIR_MM_GROW();
 
@@ -92,19 +93,19 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate) {
 	ZEPHIR_OBS_VAR(config);
 	zephir_read_property_this(&config, this_ptr, SL("_config"), PH_NOISY_CC);
 	ZEPHIR_OBS_VAR(items);
-	zephir_array_fetch_string(&items, config, SL("data"), PH_NOISY, "phalcon/paginator/adapter/model.zep", 80 TSRMLS_CC);
+	zephir_array_fetch_string(&items, config, SL("data"), PH_NOISY, "phalcon/paginator/adapter/model.zep", 82 TSRMLS_CC);
 	ZEPHIR_OBS_VAR(_1);
 	zephir_read_property_this(&_1, this_ptr, SL("_page"), PH_NOISY_CC);
 	pageNumber = zephir_get_intval(_1);
 	if (Z_TYPE_P(items) != IS_OBJECT) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(phalcon_paginator_exception_ce, "Invalid data for paginator", "phalcon/paginator/adapter/model.zep", 84);
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(phalcon_paginator_exception_ce, "Invalid data for paginator", "phalcon/paginator/adapter/model.zep", 86);
 		return;
 	}
 	if (pageNumber <= 0) {
 		pageNumber = 1;
 	}
 	if (show <= 0) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(phalcon_paginator_exception_ce, "The start page number is zero or less", "phalcon/paginator/adapter/model.zep", 94);
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(phalcon_paginator_exception_ce, "The start page number is zero or less", "phalcon/paginator/adapter/model.zep", 96);
 		return;
 	}
 	n = zephir_fast_count_int(items TSRMLS_CC);
@@ -119,32 +120,32 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate) {
 	}
 	if (n > 0) {
 		if (start <= n) {
-			ZEPHIR_INIT_VAR(_2);
-			ZVAL_LONG(_2, start);
-			ZEPHIR_CALL_METHOD(NULL, items, "seek", NULL, 0, _2);
+			ZEPHIR_INIT_VAR(_2$$9);
+			ZVAL_LONG(_2$$9, start);
+			ZEPHIR_CALL_METHOD(NULL, items, "seek", NULL, 0, _2$$9);
 			zephir_check_call_status();
 		} else {
-			ZEPHIR_INIT_NVAR(_2);
-			ZVAL_LONG(_2, 0);
-			ZEPHIR_CALL_METHOD(NULL, items, "seek", NULL, 0, _2);
+			ZEPHIR_INIT_VAR(_3$$10);
+			ZVAL_LONG(_3$$10, 0);
+			ZEPHIR_CALL_METHOD(NULL, items, "seek", NULL, 0, _3$$10);
 			zephir_check_call_status();
 			pageNumber = 1;
 		}
 		i = 1;
 		while (1) {
-			ZEPHIR_CALL_METHOD(&_3, items, "valid", NULL, 0);
+			ZEPHIR_CALL_METHOD(&_4$$8, items, "valid", NULL, 0);
 			zephir_check_call_status();
-			if (!(zephir_is_true(_3))) {
+			if (!(zephir_is_true(_4$$8))) {
 				break;
 			}
-			ZEPHIR_CALL_METHOD(&_4, items, "current", &_5, 0);
+			ZEPHIR_CALL_METHOD(&_5$$11, items, "current", &_6, 0);
 			zephir_check_call_status();
-			zephir_array_append(&pageItems, _4, PH_SEPARATE, "phalcon/paginator/adapter/model.zep", 121);
+			zephir_array_append(&pageItems, _5$$11, PH_SEPARATE, "phalcon/paginator/adapter/model.zep", 123);
 			if (i >= show) {
 				break;
 			}
 			i++;
-			ZEPHIR_CALL_METHOD(NULL, items, "next", &_6, 0);
+			ZEPHIR_CALL_METHOD(NULL, items, "next", &_7, 0);
 			zephir_check_call_status();
 		}
 	}
@@ -160,29 +161,29 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate) {
 	ZEPHIR_INIT_VAR(page);
 	object_init(page);
 	zephir_update_property_zval(page, SL("items"), pageItems TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, 1);
-	zephir_update_property_zval(page, SL("first"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, before);
-	zephir_update_property_zval(page, SL("before"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, pageNumber);
-	zephir_update_property_zval(page, SL("current"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, totalPages);
-	zephir_update_property_zval(page, SL("last"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, next);
-	zephir_update_property_zval(page, SL("next"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, totalPages);
-	zephir_update_property_zval(page, SL("total_pages"), _7 TSRMLS_CC);
-	ZEPHIR_INIT_ZVAL_NREF(_7);
-	ZVAL_LONG(_7, n);
-	zephir_update_property_zval(page, SL("total_items"), _7 TSRMLS_CC);
-	_7 = zephir_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY_CC);
-	zephir_update_property_zval(page, SL("limit"), _7 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, 1);
+	zephir_update_property_zval(page, SL("first"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, before);
+	zephir_update_property_zval(page, SL("before"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, pageNumber);
+	zephir_update_property_zval(page, SL("current"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, totalPages);
+	zephir_update_property_zval(page, SL("last"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, next);
+	zephir_update_property_zval(page, SL("next"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, totalPages);
+	zephir_update_property_zval(page, SL("total_pages"), _8 TSRMLS_CC);
+	ZEPHIR_INIT_ZVAL_NREF(_8);
+	ZVAL_LONG(_8, n);
+	zephir_update_property_zval(page, SL("total_items"), _8 TSRMLS_CC);
+	_8 = zephir_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY_CC);
+	zephir_update_property_zval(page, SL("limit"), _8 TSRMLS_CC);
 	RETURN_CCTOR(page);
 
 }

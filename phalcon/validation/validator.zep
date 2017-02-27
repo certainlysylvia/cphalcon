@@ -2,7 +2,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -34,22 +34,18 @@ abstract class Validator implements ValidatorInterface
 	/**
 	 * Phalcon\Validation\Validator constructor
 	 */
-	public function __construct(var options = null)
+	public function __construct(array! options = null)
 	{
-		if typeof options != "array" && typeof options != "null" {
-			throw new Exception("Options must be an array");
-		} else {
-			let this->_options = options;
-		}
+		let this->_options = options;
 	}
 
 	/**
-	 * Checks if an option is defined
+	 * Checks if an option has been defined
 
 	 * @deprecated since 2.1.0
 	 * @see \Phalcon\Validation\Validator::hasOption()
 	 */
-	public function isSetOption(string! key) -> boolean
+	deprecated public function isSetOption(string! key) -> boolean
 	{
 		return isset this->_options[key];
 	}
@@ -68,11 +64,20 @@ abstract class Validator implements ValidatorInterface
 	 */
 	public function getOption(string! key, var defaultValue = null) -> var
 	{
-		var options, value;
+		var options, value, fieldValue;
 		let options = this->_options;
 
 		if typeof options == "array" {
 			if fetch value, options[key] {
+				/*
+				 * If we have attribute it means it's Uniqueness validator, we
+				 * can have here multiple fields, so we need to check it
+				 */
+				if key == "attribute" && typeof value == "array" {
+					if fetch fieldValue, value[key] {
+						return fieldValue;
+					}
+				}
 				return value;
 			}
 		}
@@ -88,8 +93,8 @@ abstract class Validator implements ValidatorInterface
 		let this->_options[key] = value;
 	}
 
-    /**
-     * Executes the validation
-     */
-     abstract public function validate(<Validation> validation, string! attribute) -> boolean;
+	/**
+	 * Executes the validation
+	 */
+	abstract public function validate(<Validation> validation, string! attribute) -> boolean;
 }

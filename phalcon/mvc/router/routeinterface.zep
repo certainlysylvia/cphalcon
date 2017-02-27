@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -26,11 +26,15 @@ namespace Phalcon\Mvc\Router;
  */
 interface RouteInterface
 {
+	/**
+	 * Sets a hostname restriction to the route
+	 */
+	public function setHostname(string hostname) -> <RouteInterface>;
 
 	/**
-	 * Phalcon\Mvc\Router\Route constructor
+	 * Returns the hostname restriction if any
 	 */
-	public function __construct(string! pattern, var paths = null, var httpMethods = null);
+	public function getHostname() -> string;
 
 	/**
 	 * Replaces placeholders from pattern returning a valid PCRE regular expression
@@ -60,7 +64,7 @@ interface RouteInterface
 	/**
 	 * Sets a set of HTTP methods that constraint the matching of the route
 	 */
-	public function setHttpMethods(var httpMethods) -> string | array;
+	public function setHttpMethods(var httpMethods) -> <RouteInterface>;
 
 	/**
 	 * Returns the route's id

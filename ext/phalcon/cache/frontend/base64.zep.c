@@ -29,27 +29,37 @@
  *<?php
  *
  * // Cache the files for 2 days using a Base64 frontend
- * $frontCache = new \Phalcon\Cache\Frontend\Base64(array(
- *    "lifetime" => 172800
- * ));
+ * $frontCache = new \Phalcon\Cache\Frontend\Base64(
+ *     [
+ *         "lifetime" => 172800,
+ *     ]
+ * );
  *
  * //Create a MongoDB cache
- * $cache = new \Phalcon\Cache\Backend\Mongo($frontCache, array(
- *		'server' => "mongodb://localhost",
- *      'db' => 'caches',
- *		'collection' => 'images'
- * ));
+ * $cache = new \Phalcon\Cache\Backend\Mongo(
+ *     $frontCache,
+ *     [
+ *         "server"     => "mongodb://localhost",
+ *         "db"         => "caches",
+ *         "collection" => "images",
+ *     ]
+ * );
+ *
+ * $cacheKey = "some-image.jpg.cache";
  *
  * // Try to get cached image
- * $cacheKey = 'some-image.jpg.cache';
- * $image    = $cache->get($cacheKey);
- * if ($image === null) {
+ * $image = $cache->get($cacheKey);
  *
+ * if ($image === null) {
  *     // Store the image in the cache
- *     $cache->save($cacheKey, file_get_contents('tmp-dir/some-image.jpg'));
+ *     $cache->save(
+ *         $cacheKey,
+ *         file_get_contents("tmp-dir/some-image.jpg")
+ *     );
  * }
  *
- * header('Content-Type: image/jpeg');
+ * header("Content-Type: image/jpeg");
+ *
  * echo $image;
  *</code>
  */
@@ -89,7 +99,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, __construct) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, getLifetime) {
 
-	zval *options, *lifetime;
+	zval *options = NULL, *lifetime = NULL;
 
 
 	options = zephir_fetch_nproperty_this(this_ptr, SL("_frontendOptions"), PH_NOISY_CC);
@@ -107,6 +117,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, getLifetime) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, isBuffering) {
 
+	
 
 	RETURN_BOOL(0);
 
@@ -117,6 +128,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, isBuffering) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, start) {
 
+	
 
 
 }
@@ -128,6 +140,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, start) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, getContent) {
 
+	
 
 	RETURN_NULL();
 
@@ -138,15 +151,13 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, getContent) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, stop) {
 
+	
 
 
 }
 
 /**
  * Serializes data before storing them
- *
- * @param mixed data
- * @return string
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, beforeStore) {
 
@@ -158,7 +169,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, beforeStore) {
 
 
 
-	ZEPHIR_RETURN_CALL_FUNCTION("base64_encode", NULL, 114, data);
+	ZEPHIR_RETURN_CALL_FUNCTION("base64_encode", NULL, 123, data);
 	zephir_check_call_status();
 	RETURN_MM();
 
@@ -166,9 +177,6 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, beforeStore) {
 
 /**
  * Unserializes data after retrieval
- *
- * @param mixed data
- * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Base64, afterRetrieve) {
 
@@ -180,7 +188,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Base64, afterRetrieve) {
 
 
 
-	ZEPHIR_RETURN_CALL_FUNCTION("base64_decode", NULL, 115, data);
+	ZEPHIR_RETURN_CALL_FUNCTION("base64_decode", NULL, 124, data);
 	zephir_check_call_status();
 	RETURN_MM();
 

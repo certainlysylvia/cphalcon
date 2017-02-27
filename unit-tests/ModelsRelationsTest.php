@@ -75,6 +75,7 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
 		$this->_testIssue938($di);
+		$this->_testIssue11042();
 	}
 
 	public function testModelsPostgresql()
@@ -94,6 +95,7 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
+		$this->_testIssue11042();
 
 	}
 
@@ -115,6 +117,7 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
 		$this->_testIssue938($di);
+		$this->_testIssue11042();
 	}
 
 	public function _executeTestsNormal($di)
@@ -147,6 +150,9 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 		$parts = $robot->getRelationsParts();
 		$this->assertEquals(get_class($parts), 'Phalcon\Mvc\Model\Resultset\Simple');
 		$this->assertEquals(count($parts), 3);
+
+		$partsCount = $robot->countRelationsParts();
+		$this->assertEquals(3, $partsCount);
 
 		/** Passing parameters to magic methods **/
 		$robotsParts = $robot->getRelationsRobotsParts("parts_id = 1");
@@ -366,5 +372,23 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals($rp[$i]->parts_id, $parts[$i]->id);
 			$this->assertEquals($rp[$i]->robots_id, $robot->id);
 		}
+	}
+
+	protected function _testIssue11042()
+	{
+		$robot = RelationsRobots::findFirst();
+		$this->assertNotEquals($robot, false);
+		$this->assertEquals($robot->getDirtyState(), $robot::DIRTY_STATE_PERSISTENT);
+
+		$robotsParts = $robot->getRelationsRobotsParts();
+		$this->assertEquals($robot->getDirtyState(), $robot::DIRTY_STATE_PERSISTENT);
+		$this->assertInstanceOf('RelationsRobotsParts', $robotsParts->getFirst());
+
+		$robot = RelationsRobots::findFirst();
+		$this->assertNotEquals($robot, false);
+
+		$robotsParts = $robot->relationsRobotsParts;
+		$this->assertEquals($robot->getDirtyState(), $robot::DIRTY_STATE_PERSISTENT);
+		$this->assertInstanceOf('RelationsRobotsParts', $robotsParts->getFirst());
 	}
 }

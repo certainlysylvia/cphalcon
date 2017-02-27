@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -35,22 +35,27 @@ use Phalcon\Cache\FrontendInterface;
  *<?php
  *
  * // Cache the data for 2 days
- * $frontCache = new \Phalcon\Cache\Frontend\Json(array(
- *    "lifetime" => 172800
- * ));
+ * $frontCache = new \Phalcon\Cache\Frontend\Json(
+ *     [
+ *         "lifetime" => 172800,
+ *     ]
+ * );
  *
- * //Create the Cache setting memcached connection options
- * $cache = new \Phalcon\Cache\Backend\Memcache($frontCache, array(
- *		'host' => 'localhost',
- *		'port' => 11211,
- *  	'persistent' => false
- * ));
+ * // Create the Cache setting memcached connection options
+ * $cache = new \Phalcon\Cache\Backend\Memcache(
+ *     $frontCache,
+ *     [
+ *         "host"       => "localhost",
+ *         "port"       => 11211,
+ *         "persistent" => false,
+ *     ]
+ * );
  *
- * //Cache arbitrary data
- * $cache->save('my-data', array(1, 2, 3, 4, 5));
+ * // Cache arbitrary data
+ * $cache->save("my-data", [1, 2, 3, 4, 5]);
  *
- * //Get data
- * $data = $cache->get('my-data');
+ * // Get data
+ * $data = $cache->get("my-data");
  *</code>
  */
 class Json implements FrontendInterface
@@ -119,23 +124,18 @@ class Json implements FrontendInterface
 
 	/**
 	 * Serializes data before storing them
-	 *
-	 * @param mixed data
-	 * @return string
 	 */
-	public function beforeStore(data) -> string
+	public function beforeStore(var data) -> string
 	{
 		return json_encode(data);
 	}
 
 	/**
 	 * Unserializes data after retrieval
-	 *
-	 * @param mixed data
-	 * @return mixed
 	 */
-	public function afterRetrieve(data)
+	public function afterRetrieve(var data) -> var
 	{
+
 		return json_decode(data);
 	}
 }

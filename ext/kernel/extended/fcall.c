@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Zephir Language                                                        |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2015 Zephir Team (http://www.zephir-lang.com)       |
+  | Copyright (c) 2011-2016 Zephir Team (http://www.zephir-lang.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -104,7 +104,7 @@ int zephir_call_func_aparams_fast(zval **return_value_ptr, zephir_fcall_cache_en
 	zend_class_entry *calling_scope = NULL;
 	zend_class_entry *called_scope = NULL;
 	zend_execute_data execute_data;
-	zval ***params, ***params_ptr, ***params_array = NULL;
+	zval ***params, ***params_array = NULL;
 	zval **static_params_array[10];
 	zend_class_entry *old_scope = EG(scope);
 	zend_function_state *function_state = &EX(function_state);

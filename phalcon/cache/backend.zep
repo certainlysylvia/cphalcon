@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -26,7 +26,7 @@ use Phalcon\Cache\FrontendInterface;
  *
  * This class implements common functionality for backend adapters. A backend cache adapter may extend this class
  */
-abstract class Backend
+abstract class Backend implements BackendInterface
 {
 
 	protected _frontend { get, set };

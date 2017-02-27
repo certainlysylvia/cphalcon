@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Mvc\Model\MetaData;
 
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\MetaDataInterface;
 
 /**
  * Phalcon\Mvc\Model\MetaData\Xcache
@@ -32,18 +31,22 @@ use Phalcon\Mvc\Model\MetaDataInterface;
  * You can query the meta-data by printing xcache_get('$PMM$') or xcache_get('$PMM$my-app-id')
  *
  *<code>
- *	$metaData = new Phalcon\Mvc\Model\Metadata\Xcache(array(
- *		'prefix' => 'my-app-id',
- *		'lifetime' => 86400
- *	));
+ * $metaData = new Phalcon\Mvc\Model\Metadata\Xcache(
+ *     [
+ *         "prefix"   => "my-app-id",
+ *         "lifetime" => 86400,
+ *     ]
+ * );
  *</code>
  */
-class Xcache extends MetaData implements MetaDataInterface
+class Xcache extends MetaData
 {
 
 	protected _prefix = "";
 
 	protected _ttl = 172800;
+
+	protected _metaData = [];
 
 	/**
 	 * Phalcon\Mvc\Model\MetaData\Xcache constructor
@@ -62,7 +65,6 @@ class Xcache extends MetaData implements MetaDataInterface
 				let this->_ttl = ttl;
 			}
 		}
-		let this->_metaData = [];
 	}
 
 	/**

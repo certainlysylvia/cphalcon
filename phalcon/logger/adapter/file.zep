@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Logger\Adapter;
 
 use Phalcon\Logger\Adapter;
-use Phalcon\Logger\AdapterInterface;
 use Phalcon\Logger\Exception;
 use Phalcon\Logger\FormatterInterface;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
@@ -31,14 +30,16 @@ use Phalcon\Logger\Formatter\Line as LineFormatter;
  * Adapter to store logs in plain text files
  *
  *<code>
- *	$logger = new \Phalcon\Logger\Adapter\File("app/logs/test.log");
- *	$logger->log("This is a message");
- *	$logger->log("This is an error", \Phalcon\Logger::ERROR);
- *	$logger->error("This is another error");
- *	$logger->close();
+ * $logger = new \Phalcon\Logger\Adapter\File("app/logs/test.log");
+ *
+ * $logger->log("This is a message");
+ * $logger->log(\Phalcon\Logger::ERROR, "This is an error");
+ * $logger->error("This is another error");
+ *
+ * $logger->close();
  *</code>
  */
-class File extends Adapter implements AdapterInterface
+class File extends Adapter
 {
 
 	/**

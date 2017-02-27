@@ -26,9 +26,14 @@ ZEPHIR_INIT_CLASS(Phalcon_Mvc_Router_RouteInterface) {
 }
 
 /**
- * Phalcon\Mvc\Router\Route constructor
+ * Sets a hostname restriction to the route
  */
-ZEPHIR_DOC_METHOD(Phalcon_Mvc_Router_RouteInterface, __construct);
+ZEPHIR_DOC_METHOD(Phalcon_Mvc_Router_RouteInterface, setHostname);
+
+/**
+ * Returns the hostname restriction if any
+ */
+ZEPHIR_DOC_METHOD(Phalcon_Mvc_Router_RouteInterface, getHostname);
 
 /**
  * Replaces placeholders from pattern returning a valid PCRE regular expression

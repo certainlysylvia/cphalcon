@@ -4,7 +4,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -28,12 +28,12 @@ use Zephir\Optimizers\OptimizerAbstract;
 
 class PhalconEscapeJsOptimizer extends OptimizerAbstract
 {
-
 	/**
-	 *
 	 * @param array $expression
 	 * @param Call $call
 	 * @param CompilationContext $context
+	 * @return bool|CompiledExpression
+	 * @throws CompilerException
 	 */
 	public function optimize(array $expression, Call $call, CompilationContext $context)
 	{
@@ -63,7 +63,10 @@ class PhalconEscapeJsOptimizer extends OptimizerAbstract
 		$context->headersManager->add('kernel/filter');
 
 		$resolvedParams = $call->getResolvedParams($expression['parameters'], $context, $expression);
-		$context->codePrinter->output('zephir_escape_js(' . $symbolVariable->getName() . ', ' . $resolvedParams[0] . ');');
+
+		$symbol = $context->backend->getVariableCode($symbolVariable);
+		$context->codePrinter->output('zephir_escape_js(' . $symbol . ', ' . $resolvedParams[0] . ');');
+
 		return new CompiledExpression('variable', $symbolVariable->getRealName(), $expression);
 	}
 

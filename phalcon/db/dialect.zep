@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -51,6 +51,22 @@ abstract class Dialect implements DialectInterface
 	}
 
 	/**
+	 * Escape Schema
+	 */
+	public final function escapeSchema(string! str, string escapeChar = null) -> string
+	{
+		if !globals_get("db.escape_identifiers") {
+			return str;
+		}
+
+		if escapeChar == "" {
+			let escapeChar = (string) this->_escapeChar;
+		}
+
+		return escapeChar . trim(str, escapeChar) . escapeChar;
+	}
+
+	/**
 	 * Escape identifiers
 	 */
 	public final function escape(string! str, string escapeChar = null) -> string
@@ -68,7 +84,7 @@ abstract class Dialect implements DialectInterface
 		if !memstr(str, ".") {
 
 			if escapeChar != "" && str != "*" {
-				return escapeChar . str . escapeChar;
+				return escapeChar . str_replace(escapeChar, escapeChar . escapeChar, str) . escapeChar;
 			}
 
 			return str;
@@ -83,7 +99,7 @@ abstract class Dialect implements DialectInterface
 				continue;
 			}
 
-			let newParts[key] = escapeChar . part . escapeChar;
+			let newParts[key] = escapeChar . str_replace(escapeChar, escapeChar . escapeChar, part) . escapeChar;
 		}
 
 		return implode(".", newParts);
@@ -93,11 +109,11 @@ abstract class Dialect implements DialectInterface
 	 * Generates the SQL for LIMIT clause
 	 *
 	 * <code>
-	 *    $sql = $dialect->limit('SELECT * FROM robots', 10);
-	 *    echo $sql; // SELECT * FROM robots LIMIT 10
+	 * $sql = $dialect->limit("SELECT * FROM robots", 10);
+	 * echo $sql; // SELECT * FROM robots LIMIT 10
 	 *
-	 *    $sql = $dialect->limit('SELECT * FROM robots', [10, 50]);
-	 *    echo $sql; // SELECT * FROM robots LIMIT 10 OFFSET 50
+	 * $sql = $dialect->limit("SELECT * FROM robots", [10, 50]);
+	 * echo $sql; // SELECT * FROM robots LIMIT 10 OFFSET 50
 	 * </code>
 	 */
 	public function limit(string! sqlQuery, var number) -> string
@@ -120,7 +136,7 @@ abstract class Dialect implements DialectInterface
 	 * Returns a SQL modified with a FOR UPDATE clause
 	 *
 	 *<code>
-	 * $sql = $dialect->forUpdate('SELECT * FROM robots');
+	 * $sql = $dialect->forUpdate("SELECT * FROM robots");
 	 * echo $sql; // SELECT * FROM robots FOR UPDATE
 	 *</code>
 	 */
@@ -133,7 +149,7 @@ abstract class Dialect implements DialectInterface
 	 * Returns a SQL modified with a LOCK IN SHARE MODE clause
 	 *
 	 *<code>
-	 * $sql = $dialect->sharedLock('SELECT * FROM robots');
+	 * $sql = $dialect->sharedLock("SELECT * FROM robots");
 	 * echo $sql; // SELECT * FROM robots LOCK IN SHARE MODE
 	 *</code>
 	 */
@@ -146,7 +162,12 @@ abstract class Dialect implements DialectInterface
 	 * Gets a list of columns with escaped identifiers
 	 *
 	 * <code>
-	 *    echo $dialect->getColumnList(array('column1', 'column'));
+	 * echo $dialect->getColumnList(
+	 *     [
+	 *         "column1",
+	 *         "column",
+	 *     ]
+	 * );
 	 * </code>
 	 */
 	public final function getColumnList(array! columnList, string escapeChar = null, bindCounts = null) -> string
@@ -230,7 +251,7 @@ abstract class Dialect implements DialectInterface
 	}
 
 	/**
-	 * Transforms an intermediate representation for a expression into a database system valid expression
+	 * Transforms an intermediate representation for an expression into a database system valid expression
 	 */
 	public function getSqlExpression(array! expression, string escapeChar = null, bindCounts = null) -> string
 	{
@@ -818,18 +839,18 @@ abstract class Dialect implements DialectInterface
 	 */
 	protected final function getSqlExpressionGroupBy(var expression, string escapeChar = null, bindCounts = null) -> string
 	{
-		var filed, fields;
+		var field, fields;
 
 		if typeof expression == "array" {
 
 			let fields = [];
 
-			for filed in expression {
-				if unlikely typeof filed != "array" {
+			for field in expression {
+				if unlikely typeof field != "array" {
 					throw new Exception("Invalid SQL-GROUP-BY expression");
 				}
 
-				let fields[] = this->getSqlExpression(filed, escapeChar, bindCounts);
+				let fields[] = this->getSqlExpression(field, escapeChar, bindCounts);
 			}
 
 			let fields = join(", ", fields);
@@ -844,38 +865,34 @@ abstract class Dialect implements DialectInterface
 	/**
 	 * Resolve a HAVING clause
 	 */
-	protected final function getSqlExpressionHaving(var expression, string escapeChar = null, bindCounts = null) -> string
+	protected final function getSqlExpressionHaving(array! expression, string escapeChar = null, bindCounts = null) -> string
 	{
-		if typeof expression == "array" {
-			return "HAVING " . this->getSqlExpression(expression, escapeChar, bindCounts);
-		}
-
-		throw new Exception("Invalid SQL-HAVING expression");
+		return "HAVING " . this->getSqlExpression(expression, escapeChar, bindCounts);
 	}
 
 	/**
-	 * Resolve a ORDER BY clause
+	 * Resolve an ORDER BY clause
 	 */
 	protected final function getSqlExpressionOrderBy(var expression, string escapeChar = null, bindCounts = null) -> string
 	{
-		var filed, fields, type, fieldSql = null;
+		var field, fields, type, fieldSql = null;
 
 		if typeof expression == "array" {
 
 			let fields = [];
 
-			for filed in expression {
+			for field in expression {
 
-				if unlikely typeof filed != "array" {
+				if unlikely typeof field != "array" {
 					throw new Exception("Invalid SQL-ORDER-BY expression");
 				}
 
-				let fieldSql = this->getSqlExpression(filed[0], escapeChar, bindCounts);
+				let fieldSql = this->getSqlExpression(field[0], escapeChar, bindCounts);
 
 				/**
 				 * In the numeric 1 position could be a ASC/DESC clause
 				 */
-				if fetch type, filed[1] && type != "" {
+				if fetch type, field[1] && type != "" {
 					let fieldSql .= " " . type;
 				}
 
@@ -912,7 +929,7 @@ abstract class Dialect implements DialectInterface
 			}
 
 			/**
-			 * Check for a OFFSET condition
+			 * Check for an OFFSET condition
 			 */
 			if fetch offset, value["offset"] && typeof offset == "array" {
 				let offset = this->getSqlExpression(offset, escapeChar, bindCounts);
@@ -947,7 +964,7 @@ abstract class Dialect implements DialectInterface
 		 * Schema
 		 */
 		if schema != "" {
-			let table = this->escape(schema, escapeChar) . "." . table;
+			let table = this->escapeSchema(schema, escapeChar) . "." . table;
 		}
 
 		/**

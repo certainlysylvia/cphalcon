@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,7 +21,6 @@ namespace Phalcon\Paginator\Adapter;
 
 use Phalcon\Mvc\Model\Query\Builder;
 use Phalcon\Paginator\Adapter;
-use Phalcon\Paginator\AdapterInterface;
 use Phalcon\Paginator\Exception;
 
 /**
@@ -29,20 +28,24 @@ use Phalcon\Paginator\Exception;
  *
  * Pagination using a PHQL query builder as source of data
  *
- *<code>
- *  $builder = $this->modelsManager->createBuilder()
- *                   ->columns('id, name')
- *                   ->from('Robots')
- *                   ->orderBy('name');
+ * <code>
+ * use Phalcon\Paginator\Adapter\QueryBuilder;
  *
- *  $paginator = new Phalcon\Paginator\Adapter\QueryBuilder(array(
- *      "builder" => $builder,
- *      "limit"=> 20,
- *      "page" => 1
- *  ));
+ * $builder = $this->modelsManager->createBuilder()
+ *                 ->columns("id, name")
+ *                 ->from("Robots")
+ *                 ->orderBy("name");
+ *
+ * $paginator = new QueryBuilder(
+ *     [
+ *         "builder" => $builder,
+ *         "limit"   => 20,
+ *         "page"    => 1,
+ *     ]
+ * );
  *</code>
  */
-class QueryBuilder extends Adapter implements AdapterInterface
+class QueryBuilder extends Adapter
 {
 	/**
 	 * Configuration of paginator by model
@@ -163,6 +166,20 @@ class QueryBuilder extends Adapter implements AdapterInterface
 		totalBuilder->columns("COUNT(*) [rowcount]");
 
 		/**
+		 * Change 'COUNT()' parameters, when the query contains 'GROUP BY'
+		 */
+		var groups = totalBuilder->getGroupBy();
+		if !empty groups {
+			var groupColumn;
+			if typeof groups == "array" {
+				let groupColumn = implode(", ", groups);
+			} else {
+				let groupColumn = groups;
+			}
+			totalBuilder->groupBy(null)->columns(["COUNT(DISTINCT ".groupColumn.") AS rowcount"]);
+		}
+
+		/**
 		 * Remove the 'ORDER BY' clause, PostgreSQL requires this
 		 */
 		totalBuilder->orderBy(null);
@@ -177,7 +194,7 @@ class QueryBuilder extends Adapter implements AdapterInterface
 		 */
 		let result = totalQuery->execute(),
 			row = result->getFirst(),
-			rowcount = intval(row->rowcount),
+			rowcount = row ? intval(row->rowcount) : 0,
 			totalPages = intval(ceil(rowcount / limit));
 
 		if numberPage < totalPages {

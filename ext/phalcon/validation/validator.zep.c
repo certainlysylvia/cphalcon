@@ -12,11 +12,11 @@
 #include <Zend/zend_interfaces.h>
 
 #include "kernel/main.h"
-#include "kernel/exception.h"
 #include "kernel/object.h"
 #include "kernel/memory.h"
-#include "kernel/array.h"
 #include "ext/spl/spl_exceptions.h"
+#include "kernel/exception.h"
+#include "kernel/array.h"
 #include "kernel/operators.h"
 
 
@@ -41,31 +41,27 @@ ZEPHIR_INIT_CLASS(Phalcon_Validation_Validator) {
  */
 PHP_METHOD(Phalcon_Validation_Validator, __construct) {
 
-	zend_bool _0;
+	zval *options_param = NULL;
 	zval *options = NULL;
 
-	zephir_fetch_params(0, 0, 1, &options);
+	ZEPHIR_MM_GROW();
+	zephir_fetch_params(1, 0, 1, &options_param);
 
-	if (!options) {
-		options = ZEPHIR_GLOBAL(global_null);
-	}
-
-
-	_0 = Z_TYPE_P(options) != IS_ARRAY;
-	if (_0) {
-		_0 = Z_TYPE_P(options) != IS_NULL;
-	}
-	if (_0) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STRW(phalcon_validation_exception_ce, "Options must be an array", "phalcon/validation/validator.zep", 40);
-		return;
+	if (!options_param) {
+		ZEPHIR_INIT_VAR(options);
+		array_init(options);
 	} else {
-		zephir_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	options = options_param;
 	}
+
+
+	zephir_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	ZEPHIR_MM_RESTORE();
 
 }
 
 /**
- * Checks if an option is defined
+ * Checks if an option has been defined
 
  * @deprecated since 2.1.0
  * @see \Phalcon\Validation\Validator::hasOption()
@@ -82,7 +78,6 @@ PHP_METHOD(Phalcon_Validation_Validator, isSetOption) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -111,7 +106,6 @@ PHP_METHOD(Phalcon_Validation_Validator, hasOption) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -131,7 +125,8 @@ PHP_METHOD(Phalcon_Validation_Validator, hasOption) {
  */
 PHP_METHOD(Phalcon_Validation_Validator, getOption) {
 
-	zval *key_param = NULL, *defaultValue = NULL, *options, *value;
+	zend_bool _0$$4;
+	zval *key_param = NULL, *defaultValue = NULL, *options = NULL, *value = NULL, *fieldValue = NULL;
 	zval *key = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -141,7 +136,6 @@ PHP_METHOD(Phalcon_Validation_Validator, getOption) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -156,6 +150,15 @@ PHP_METHOD(Phalcon_Validation_Validator, getOption) {
 	options = zephir_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY_CC);
 	if (Z_TYPE_P(options) == IS_ARRAY) {
 		if (zephir_array_isset_fetch(&value, options, key, 1 TSRMLS_CC)) {
+			_0$$4 = ZEPHIR_IS_STRING(key, "attribute");
+			if (_0$$4) {
+				_0$$4 = Z_TYPE_P(value) == IS_ARRAY;
+			}
+			if (_0$$4) {
+				if (zephir_array_isset_fetch(&fieldValue, value, key, 1 TSRMLS_CC)) {
+					RETURN_CTOR(fieldValue);
+				}
+			}
 			RETURN_CTOR(value);
 		}
 	}
@@ -179,7 +182,6 @@ PHP_METHOD(Phalcon_Validation_Validator, setOption) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {

@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,9 +20,8 @@
 namespace Phalcon\Session\Adapter;
 
 use Phalcon\Session\Adapter;
-use Phalcon\Session\AdapterInterface;
 use Phalcon\Cache\Backend\Redis;
-use Phalcon\Cache\Frontend\Data as FrontendData;
+use Phalcon\Cache\Frontend\None as FrontendNone;
 
 /**
  * Phalcon\Session\Adapter\Redis
@@ -30,26 +29,30 @@ use Phalcon\Cache\Frontend\Data as FrontendData;
  * This adapter store sessions in Redis
  *
  *<code>
- * $session = new \Phalcon\Session\Adapter\Redis(array(
- *    'uniqueId' => 'my-private-app',
- *	  'host' => 'localhost',
- *	  'port' => 6379,
- *	  'auth' => 'foobared',
- *    'persistent' => false,
- *    'lifetime' => 3600,
- *    'prefix' => 'my_'
- * ));
+ * use Phalcon\Session\Adapter\Redis;
+ *
+ * $session = new Redis(
+ *     [
+ *         "uniqueId"   => "my-private-app",
+ *         "host"       => "localhost",
+ *         "port"       => 6379,
+ *         "auth"       => "foobared",
+ *         "persistent" => false,
+ *         "lifetime"   => 3600,
+ *         "prefix"     => "my",
+ *         "index"      => 1,
+ *     ]
+ * );
  *
  * $session->start();
  *
- * $session->set('var', 'some-value');
+ * $session->set("var", "some-value");
  *
- * echo $session->get('var');
+ * echo $session->get("var");
  *</code>
  */
-class Redis extends Adapter implements AdapterInterface
+class Redis extends Adapter
 {
-
 	protected _redis = null { get };
 
 	protected _lifetime = 8600 { get };
@@ -78,7 +81,7 @@ class Redis extends Adapter implements AdapterInterface
 		}
 
 		let this->_redis = new Redis(
-			new FrontendData(["lifetime": this->_lifetime]),
+			new FrontendNone(["lifetime": this->_lifetime]),
 			options
 		);
 
@@ -94,56 +97,58 @@ class Redis extends Adapter implements AdapterInterface
 		parent::__construct(options);
 	}
 
-	public function open()
+	/**
+	 * {@inheritdoc}
+	 */
+	public function open() -> boolean
 	{
 		return true;
 	}
 
-	public function close()
+	/**
+	 * {@inheritdoc}
+	 */
+	public function close() -> boolean
 	{
 		return true;
 	}
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param string sessionId
-	 * @return mixed
 	 */
-	public function read(sessionId)
+	public function read(sessionId) -> string
 	{
-		return this->_redis->get(sessionId, this->_lifetime);
+		return (string) this->_redis->get(sessionId, this->_lifetime);
 	}
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param string sessionId
-	 * @param string data
 	 */
-	public function write(sessionId, data)
+	public function write(string sessionId, string data) -> boolean
 	{
-		this->_redis->save(sessionId, data, this->_lifetime);
+		return this->_redis->save(sessionId, data, this->_lifetime);
 	}
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param  string  sessionId
-	 * @return boolean
 	 */
-	public function destroy(sessionId = null) -> boolean
+	public function destroy(string sessionId = null) -> boolean
 	{
+		var id;
+
 		if sessionId === null {
-			let sessionId = this->getId();
+			let id = this->getId();
+		} else {
+			let id = sessionId;
 		}
-		return this->_redis->delete(sessionId);
+
+		return this->_redis->exists(id) ? this->_redis->delete(id) : true;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function gc()
+	public function gc() -> boolean
 	{
 		return true;
 	}

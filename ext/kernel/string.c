@@ -2,7 +2,7 @@
   +------------------------------------------------------------------------+
   | Zephir Language                                                        |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2015 Zephir Team (http://www.zephir-lang.com)       |
+  | Copyright (c) 2011-2016 Zephir Team (http://www.zephir-lang.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -253,15 +253,27 @@ void zephir_fast_join_str(zval *return_value, char *glue, unsigned int glue_leng
 
 /**
  * Convert dash/underscored texts returning camelized
+ * (an optional delimiter can be specified as character-mask as for ltrim)
  */
-void zephir_camelize(zval *return_value, const zval *str) {
+void zephir_camelize(zval *return_value, const zval *str, const zval *delimiter) {
 
-	int i, len, first = 0;
+	int i, len, delim_len, pre_del = 1;
 	smart_str camelize_str = {0};
-	char *marker, ch;
+	char *marker, ch, *delim;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
 		zend_error(E_WARNING, "Invalid arguments supplied for camelize()");
+		RETURN_EMPTY_STRING();
+	}
+
+	if (delimiter == NULL || Z_TYPE_P(delimiter) == IS_NULL) {
+		delim = "_-";
+		delim_len = 2;
+	} else if (Z_TYPE_P(delimiter) == IS_STRING && Z_STRLEN_P(delimiter) > 0) {
+		delim = Z_STRVAL_P(delimiter);
+		delim_len = Z_STRLEN_P(delimiter);
+	} else {
+		zend_error(E_WARNING, "The second argument passed to the camelize() must be a string containing at least one character");
 		RETURN_EMPTY_STRING();
 	}
 
@@ -269,30 +281,18 @@ void zephir_camelize(zval *return_value, const zval *str) {
 	len    = Z_STRLEN_P(str);
 
 	for (i = 0; i < len; i++) {
-
 		ch = marker[i];
 
-		if (first == 0) {
-
-			if (ch == '-' || ch == '_') {
-				continue;
-			}
-
-			first = 1;
+		if (memchr(delim, ch, delim_len)) {
+			pre_del = 1;
+			continue;
+		}
+		if (pre_del == 1) {
 			smart_str_appendc(&camelize_str, toupper(ch));
-			continue;
+			pre_del = 0;
+		} else {
+			smart_str_appendc(&camelize_str, tolower(ch));
 		}
-
-		if (ch == '-' || ch == '_') {
-			if (i != (len - 1)) {
-				i++;
-				ch = marker[i];
-				smart_str_appendc(&camelize_str, toupper(ch));
-			}
-			continue;
-		}
-
-		smart_str_appendc(&camelize_str, tolower(ch));
 	}
 
 	smart_str_0(&camelize_str);
@@ -305,17 +305,26 @@ void zephir_camelize(zval *return_value, const zval *str) {
 }
 
 /**
- * Convert dash/underscored texts returning camelized
+ * Convert a camelized to a dash/underscored texts (an optional delimiter can be specified)
  */
-void zephir_uncamelize(zval *return_value, const zval *str) {
+void zephir_uncamelize(zval *return_value, const zval *str, const zval *delimiter) {
 
 	unsigned int i;
 	smart_str uncamelize_str = {0};
-	char *marker, ch;
+	char *marker, ch, delim;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_error(E_WARNING, "Invalid arguments supplied for camelize()");
-		return;
+		zend_error(E_WARNING, "Invalid arguments supplied for uncamelize()");
+		RETURN_EMPTY_STRING();
+	}
+
+	if (delimiter == NULL || Z_TYPE_P(delimiter) == IS_NULL) {
+		delim = '_';
+	} else if (Z_TYPE_P(delimiter) == IS_STRING && Z_STRLEN_P(delimiter) == 1) {
+		delim = *(Z_STRVAL_P(delimiter));
+	} else {
+		zend_error(E_WARNING, "Second argument passed to the uncamelize() must be a string of one character");
+		RETURN_EMPTY_STRING();
 	}
 
 	marker = Z_STRVAL_P(str);
@@ -329,7 +338,7 @@ void zephir_uncamelize(zval *return_value, const zval *str) {
 
 		if (ch >= 'A' && ch <= 'Z') {
 			if (i > 0) {
-				smart_str_appendc(&uncamelize_str, '_');
+				smart_str_appendc(&uncamelize_str, delim);
 			}
 			smart_str_appendc(&uncamelize_str, (*marker) + 32);
 		} else {
@@ -532,7 +541,7 @@ void zephir_fast_str_replace(zval **return_value_ptr, zval *search, zval *replac
 		do {
 			zval *params[] = { search, replace, subject };
 			zval_ptr_dtor(return_value_ptr);
-			return_value_ptr = NULL;
+			*return_value_ptr = NULL;
 			zephir_call_func_aparams(return_value_ptr, "str_replace", sizeof("str_replace")-1, NULL, 0, 3, params TSRMLS_CC);
 			return;
 		} while(0);
@@ -670,7 +679,8 @@ void zephir_fast_strtoupper(zval *return_value, zval *str) {
 /**
  * Checks if a zval string starts with a zval string
  */
-int zephir_start_with(const zval *str, const zval *compared, zval *case_sensitive) {
+int zephir_start_with(const zval *str, const zval *compared, zval *case_sensitive)
+{
 
 	int i;
 	int sensitive = 0;
@@ -710,7 +720,8 @@ int zephir_start_with(const zval *str, const zval *compared, zval *case_sensitiv
 /**
  * Checks if a zval string starts with a string
  */
-int zephir_start_with_str(const zval *str, char *compared, unsigned int compared_length) {
+int zephir_start_with_str(const zval *str, char *compared, unsigned int compared_length)
+{
 
 	if (Z_TYPE_P(str) != IS_STRING || compared_length > Z_STRLEN_P(str)) {
 		return 0;
@@ -722,7 +733,8 @@ int zephir_start_with_str(const zval *str, char *compared, unsigned int compared
 /**
  * Checks if a string starts with other string
  */
-int zephir_start_with_str_str(char *str, unsigned int str_length, char *compared, unsigned int compared_length) {
+int zephir_start_with_str_str(char *str, unsigned int str_length, char *compared, unsigned int compared_length)
+{
 
 	if (compared_length > str_length) {
 		return 0;
@@ -1087,7 +1099,8 @@ void zephir_append_printable_array(smart_str *implstr, zval *value TSRMLS_DC) {
 /**
  * Creates a unique key to be used as index in a hash
  */
-void zephir_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC) {
+void zephir_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC)
+{
 
 	smart_str implstr = {0};
 
@@ -1109,7 +1122,6 @@ void zephir_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC) 
 		smart_str_free(&implstr);
 		RETURN_NULL();
 	}
-
 }
 
 /**
@@ -1456,11 +1468,7 @@ int zephir_http_build_query(zval *return_value, zval *params, char *sep TSRMLS_D
 		smart_str formstr = { NULL, 0, 0 };
 		int res;
 
-#if PHP_VERSION_ID < 50400
-		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep TSRMLS_CC);
-#else
 		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738 TSRMLS_CC);
-#endif
 
 		if (res == SUCCESS) {
 			if (!formstr.c) {
@@ -1488,11 +1496,7 @@ void zephir_htmlspecialchars(zval *return_value, zval *string, zval *quoting, zv
 	zval copy;
 	char *escaped, *cs;
 	int qs, use_copy = 0;
-#if PHP_VERSION_ID < 50400
-	int escaped_len;
-#else
 	size_t escaped_len;
-#endif
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		zend_make_printable_zval(string, &copy, &use_copy);
@@ -1517,11 +1521,7 @@ void zephir_htmlentities(zval *return_value, zval *string, zval *quoting, zval *
 	zval copy;
 	char *escaped, *cs;
 	int qs, use_copy = 0;
-#if PHP_VERSION_ID < 50400
-	int escaped_len;
-#else
 	size_t escaped_len;
-#endif
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		zend_make_printable_zval(string, &copy, &use_copy);
@@ -1639,11 +1639,30 @@ void zephir_stripcslashes(zval *return_value, zval *str TSRMLS_DC)
 	}
 }
 
-#if PHP_VERSION_ID < 50400
-
-const char* zend_new_interned_string(const char *arKey, int nKeyLength, int free_src TSRMLS_DC)
+/**
+ * Compares two strings using the same time whether they're equal or not.
+ * A difference in length will leak
+ */
+int zephir_hash_equals(const zval *known_zval, const zval *user_zval)
 {
-	return arKey;
-}
+	char *known_str, *user_str;
+	int result = 0;
+	size_t j;
 
-#endif
+	if (Z_TYPE_P(known_zval) != IS_STRING || Z_TYPE_P(user_zval) != IS_STRING) {
+		return 0;
+	}
+
+	if (Z_STRLEN_P(known_zval) != Z_STRLEN_P(user_zval)) {
+		return 0;
+	}
+
+	known_str = Z_STRVAL_P(known_zval);
+	user_str = Z_STRVAL_P(user_zval);
+
+	for (j = 0; j < Z_STRLEN_P(known_zval); j++) {
+		result |= known_str[j] ^ user_str[j];
+	}
+
+	return (int) (result == 0);
+}

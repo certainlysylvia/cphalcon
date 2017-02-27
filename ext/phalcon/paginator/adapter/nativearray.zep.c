@@ -25,22 +25,23 @@
  *
  * Pagination using a PHP array as source of data
  *
- *<code>
- *	$paginator = new \Phalcon\Paginator\Adapter\NativeArray(
- *		array(
- *			"data"  => array(
- *				array('id' => 1, 'name' => 'Artichoke'),
- *				array('id' => 2, 'name' => 'Carrots'),
- *				array('id' => 3, 'name' => 'Beet'),
- *				array('id' => 4, 'name' => 'Lettuce'),
- *				array('id' => 5, 'name' => '')
- *			),
- *			"limit" => 2,
- *			"page"  => $currentPage
- *		)
- *	);
- *</code>
+ * <code>
+ * use Phalcon\Paginator\Adapter\NativeArray;
  *
+ * $paginator = new NativeArray(
+ *     [
+ *         "data"  => [
+ *             ["id" => 1, "name" => "Artichoke"],
+ *             ["id" => 2, "name" => "Carrots"],
+ *             ["id" => 3, "name" => "Beet"],
+ *             ["id" => 4, "name" => "Lettuce"],
+ *             ["id" => 5, "name" => ""],
+ *         ],
+ *         "limit" => 2,
+ *         "page"  => $currentPage,
+ *     ]
+ * );
+ *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray) {
 
@@ -51,7 +52,6 @@ ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray) {
 	 */
 	zend_declare_property_null(phalcon_paginator_adapter_nativearray_ce, SL("_config"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
-	zend_class_implements(phalcon_paginator_adapter_nativearray_ce TSRMLS_CC, 1, phalcon_paginator_adapterinterface_ce);
 	return SUCCESS;
 
 }
@@ -61,7 +61,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray) {
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct) {
 
-	zval *config_param = NULL, *page, *limit;
+	zval *config_param = NULL, *page = NULL, *limit = NULL;
 	zval *config = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -86,9 +86,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct) {
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate) {
 
-	double roundedTotal;
-	int show, pageNumber, totalPages, number, before, next, ZEPHIR_LAST_CALL_STATUS;
-	zval *config, *items = NULL, *page, *_0, *_1, _2 = zval_used_for_init, *_3 = NULL, _4, *_5 = NULL, *_6;
+	double roundedTotal = 0;
+	zval *config = NULL, *items = NULL, *page = NULL, *_0, *_1, _2 = zval_used_for_init, *_3 = NULL, _4, *_5 = NULL, *_6;
+	int ZEPHIR_LAST_CALL_STATUS, show = 0, pageNumber = 0, totalPages = 0, number = 0, before = 0, next = 0;
 
 	ZEPHIR_MM_GROW();
 
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate) {
 	number = zephir_fast_count_int(items TSRMLS_CC);
 	ZEPHIR_SINIT_VAR(_2);
 	ZVAL_LONG(&_2, show);
-	ZEPHIR_CALL_FUNCTION(&_3, "floatval", NULL, 304, &_2);
+	ZEPHIR_CALL_FUNCTION(&_3, "floatval", NULL, 322, &_2);
 	zephir_check_call_status();
 	roundedTotal = zephir_safe_div_long_zval(number, _3 TSRMLS_CC);
 	totalPages = (int) (roundedTotal);
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate) {
 	ZVAL_LONG(&_2, (show * ((pageNumber - 1))));
 	ZEPHIR_SINIT_VAR(_4);
 	ZVAL_LONG(&_4, show);
-	ZEPHIR_CALL_FUNCTION(&_5, "array_slice", NULL, 372, items, &_2, &_4);
+	ZEPHIR_CALL_FUNCTION(&_5, "array_slice", NULL, 396, items, &_2, &_4);
 	zephir_check_call_status();
 	ZEPHIR_CPY_WRT(items, _5);
 	if (pageNumber < totalPages) {

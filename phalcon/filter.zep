@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -30,11 +30,12 @@ use Phalcon\Filter\Exception;
  * define his/her own filters
  *
  *<code>
- *	$filter = new \Phalcon\Filter();
- *	$filter->sanitize("some(one)@exa\\mple.com", "email"); // returns "someone@example.com"
- *	$filter->sanitize("hello<<", "string"); // returns "hello"
- *	$filter->sanitize("!100a019", "int"); // returns "100019"
- *	$filter->sanitize("!100a019.01a", "float"); // returns "100019.01"
+ * $filter = new \Phalcon\Filter();
+ *
+ * $filter->sanitize("some(one)@exa\\mple.com", "email"); // returns "someone@example.com"
+ * $filter->sanitize("hello<<", "string"); // returns "hello"
+ * $filter->sanitize("!100a019", "int"); // returns "100019"
+ * $filter->sanitize("!100a019.01a", "float"); // returns "100019.01"
  *</code>
  */
 class Filter implements FilterInterface
@@ -81,7 +82,7 @@ class Filter implements FilterInterface
 	/**
 	 * Sanitizes a value with a specified single or set of filters
 	 */
-	public function sanitize(var value, var filters, boolean noRecursive = false)
+	public function sanitize(var value, var filters, boolean noRecursive = false) -> var
 	{
 		var filter, arrayValue, itemKey, itemValue, sanitizedValue;
 
@@ -134,7 +135,7 @@ class Filter implements FilterInterface
 			/**
 			 * If the filter is a closure we call it in the PHP userland
 			 */
-			if filterObject instanceof \Closure || is_callable(filterObject) {
+			if (typeof filterObject == "object" && filterObject instanceof \Closure) || is_callable(filterObject) {
 				return call_user_func_array(filterObject, [value]);
 			}
 

@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -22,7 +22,6 @@ namespace Phalcon\Mvc\Model\Validator;
 
 use Phalcon\Mvc\EntityInterface;
 use Phalcon\Mvc\Model\Validator;
-use Phalcon\Mvc\Model\ValidatorInterface;
 use Phalcon\Mvc\Model\Exception;
 
 /**
@@ -30,30 +29,36 @@ use Phalcon\Mvc\Model\Exception;
  *
  * Simply validates specified string length constraints
  *
+ * This validator is only for use with Phalcon\Mvc\Collection. If you are using
+ * Phalcon\Mvc\Model, please use the validators provided by Phalcon\Validation.
+ *
  *<code>
- *use Phalcon\Mvc\Model\Validator\StringLength as StringLengthValidator;
+ * use Phalcon\Mvc\Model\Validator\StringLength as StringLengthValidator;
  *
- *class Subscriptors extends \Phalcon\Mvc\Model
- *{
+ * class Subscriptors extends \Phalcon\Mvc\Collection
+ * {
+ *     public function validation()
+ *     {
+ *         $this->validate(
+ *             new StringLengthValidator(
+ *                 [
+ *                     "field"          => "name_last",
+ *                     "max"            => 50,
+ *                     "min"            => 2,
+ *                     "messageMaximum" => "We don't like really long names",
+ *                     "messageMinimum" => "We want more than just their initials",
+ *                 ]
+ *             )
+ *         );
  *
- *	public function validation()
- *	{
- *		$this->validate(new StringLengthValidator(array(
- *			"field" => 'name_last',
- *			'max' => 50,
- *			'min' => 2,
- *			'messageMaximum' => 'We don\'t like really long names',
- *			'messageMinimum' => 'We want more than just their initials'
- *		)));
- *		if ($this->validationHasFailed() == true) {
- *			return false;
- *		}
- *	}
- *
- *}
+ *         if ($this->validationHasFailed() === true) {
+ *             return false;
+ *         }
+ *     }
+ * }
  *</code>
  */
-class StringLength extends Validator implements ValidatorInterface
+class StringLength extends Validator
 {
 	/**
 	 * Executes the validator

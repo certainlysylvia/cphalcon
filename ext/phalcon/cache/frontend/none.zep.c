@@ -23,32 +23,40 @@
  *<code>
  *<?php
  *
- *	//Create a None Cache
- *	$frontCache = new \Phalcon\Cache\Frontend\None();
+ * //Create a None Cache
+ * $frontCache = new \Phalcon\Cache\Frontend\None();
  *
- *	// Create the component that will cache "Data" to a "Memcached" backend
- *	// Memcached connection settings
- *	$cache = new \Phalcon\Cache\Backend\Memcache($frontCache, array(
- *		"host" => "localhost",
- *		"port" => "11211"
- *	));
+ * // Create the component that will cache "Data" to a "Memcached" backend
+ * // Memcached connection settings
+ * $cache = new \Phalcon\Cache\Backend\Memcache(
+ *     $frontCache,
+ *     [
+ *         "host" => "localhost",
+ *         "port" => "11211",
+ *     ]
+ * );
  *
- *	// This Frontend always return the data as it's returned by the backend
- *	$cacheKey = 'robots_order_id.cache';
- *	$robots    = $cache->get($cacheKey);
- *	if ($robots === null) {
+ * $cacheKey = "robots_order_id.cache";
  *
- *		// This cache doesn't perform any expiration checking, so the data is always expired
- *		// Make the database call and populate the variable
- *		$robots = Robots::find(array("order" => "id"));
+ * // This Frontend always return the data as it's returned by the backend
+ * $robots = $cache->get($cacheKey);
  *
- *		$cache->save($cacheKey, $robots);
- *	}
+ * if ($robots === null) {
+ *     // This cache doesn't perform any expiration checking, so the data is always expired
+ *     // Make the database call and populate the variable
+ *     $robots = Robots::find(
+ *         [
+ *             "order" => "id",
+ *         ]
+ *     );
  *
- *	// Use $robots :)
- *	foreach ($robots as $robot) {
- *		echo $robot->name, "\n";
- *	}
+ *     $cache->save($cacheKey, $robots);
+ * }
+ *
+ * // Use $robots :)
+ * foreach ($robots as $robot) {
+ *     echo $robot->name, "\n";
+ * }
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Cache_Frontend_None) {
@@ -65,6 +73,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Cache_Frontend_None) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, getLifetime) {
 
+	
 
 	RETURN_LONG(1);
 
@@ -75,6 +84,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, getLifetime) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, isBuffering) {
 
+	
 
 	RETURN_BOOL(0);
 
@@ -85,6 +95,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, isBuffering) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, start) {
 
+	
 
 
 }
@@ -96,6 +107,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, start) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, getContent) {
 
+	
 
 
 }
@@ -105,14 +117,13 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, getContent) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, stop) {
 
+	
 
 
 }
 
 /**
  * Prepare data to be stored
- *
- * @param mixed $data
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, beforeStore) {
 
@@ -129,8 +140,6 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, beforeStore) {
 
 /**
  * Prepares data to be retrieved to user
- *
- * @param mixed $data
  */
 PHP_METHOD(Phalcon_Cache_Frontend_None, afterRetrieve) {
 

@@ -4,7 +4,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -31,10 +31,11 @@ class PhalconGetUriOptimizer extends OptimizerAbstract
 {
 
 	/**
-	 *
 	 * @param array $expression
 	 * @param Call $call
 	 * @param CompilationContext $context
+	 * @return bool|CompiledExpression
+	 * @throws CompilerException
 	 */
 	public function optimize(array $expression, Call $call, CompilationContext $context)
 	{
@@ -64,7 +65,10 @@ class PhalconGetUriOptimizer extends OptimizerAbstract
 		$context->headersManager->add('phalcon/mvc/url/utils', HeadersManager::POSITION_LAST);
 
 		$resolvedParams = $call->getResolvedParams($expression['parameters'], $context, $expression);
-		$context->codePrinter->output('phalcon_get_uri(' . $symbolVariable->getName() . ', ' . $resolvedParams[0] . ');');
+
+		$symbol = $context->backend->getVariableCode($symbolVariable);
+		$context->codePrinter->output('phalcon_get_uri(' . $symbol . ', ' . $resolvedParams[0] . ');');
+
 		return new CompiledExpression('variable', $symbolVariable->getRealName(), $expression);
 	}
 

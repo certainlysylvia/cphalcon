@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,8 +21,6 @@ namespace Phalcon\Flash;
 
 use Phalcon\Flash as FlashBase;
 use Phalcon\DiInterface;
-use Phalcon\FlashInterface;
-use Phalcon\Di\InjectionAwareInterface;
 use Phalcon\Flash\Exception;
 use Phalcon\Session\AdapterInterface as SessionInterface;
 
@@ -31,41 +29,32 @@ use Phalcon\Session\AdapterInterface as SessionInterface;
  *
  * Temporarily stores the messages in session, then messages can be printed in the next request
  */
-class Session extends FlashBase implements FlashInterface, InjectionAwareInterface
+class Session extends FlashBase
 {
-
-	protected _dependencyInjector;
-
-	/**
-	 * Sets the dependency injector
-	 */
-	public function setDI(<DiInterface> dependencyInjector)
-	{
-		let this->_dependencyInjector = dependencyInjector;
-	}
-
-	/**
-	 * Returns the internal dependency injector
-	 */
-	public function getDI() -> <DiInterface>
-	{
-		return this->_dependencyInjector;
-	}
-
 	/**
 	 * Returns the messages stored in session
 	 */
-	protected function _getSessionMessages(boolean remove) -> array
+	protected function _getSessionMessages(boolean remove, type = null) -> array
 	{
-		var dependencyInjector, session, messages;
+		var dependencyInjector, session, messages, returnMessages;
 
-		let dependencyInjector = <DiInterface> this->_dependencyInjector;
-		if typeof dependencyInjector != "object" {
-			throw new Exception("A dependency injection container is required to access the 'session' service");
+		let dependencyInjector = <DiInterface> this->getDI();
+
+		let session = <SessionInterface> dependencyInjector->getShared("session"),
+			messages = session->get("_flashMessages");
+
+		if typeof type == "string" {
+			if fetch returnMessages, messages[type] {
+				if remove === true {
+					unset(messages[type]);
+					session->set("_flashMessages", messages);
+				}
+
+				return returnMessages;
+			}
+
+			return [];
 		}
-
-		let session = <SessionInterface> dependencyInjector->getShared("session");
-		let messages = session->get("_flashMessages");
 
 		if remove === true {
 			session->remove("_flashMessages");
@@ -81,12 +70,9 @@ class Session extends FlashBase implements FlashInterface, InjectionAwareInterfa
 	{
 		var dependencyInjector, session;
 
-		let dependencyInjector = <DiInterface> this->_dependencyInjector;
-		if typeof dependencyInjector != "object" {
-			throw new Exception("A dependency injection container is required to access the 'session' service");
-		}
+		let dependencyInjector = <DiInterface> this->getDI(),
+			session = <SessionInterface> dependencyInjector->getShared("session");
 
-		let session = <SessionInterface> dependencyInjector->getShared("session");
 		session->set("_flashMessages", messages);
 		return messages;
 	}
@@ -132,19 +118,7 @@ class Session extends FlashBase implements FlashInterface, InjectionAwareInterfa
 	 */
 	public function getMessages(type = null, boolean remove = true) -> array
 	{
-		var messages, returnMessages;
-
-		let messages = this->_getSessionMessages(remove);
-
-		if typeof type != "string" {
-			return messages;
-		}
-
-		if !fetch returnMessages, messages[type] {
-			return [];
-		}
-
-		return returnMessages;
+		return this->_getSessionMessages(remove, type);
 	}
 
 	/**

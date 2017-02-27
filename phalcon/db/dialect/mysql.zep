@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -32,7 +32,7 @@ use Phalcon\Db\DialectInterface;
  *
  * Generates database specific SQL for the MySQL RDBMS
  */
-class MySQL extends Dialect
+class Mysql extends Dialect
 {
 
 	protected _escapeChar = "`";
@@ -90,6 +90,12 @@ class MySQL extends Dialect
 			case Column::TYPE_DATETIME:
 				if empty columnSql {
 					let columnSql .= "DATETIME";
+				}
+				break;
+
+			case Column::TYPE_TIMESTAMP:
+				if empty columnSql {
+					let columnSql .= "TIMESTAMP";
 				}
 				break;
 
@@ -188,7 +194,7 @@ class MySQL extends Dialect
 
 			default:
 				if empty columnSql {
-					throw new Exception("Unrecognized MySQL data type");
+					throw new Exception("Unrecognized MySQL data type at column " . column->getName());
 				}
 
 				let typeValues = column->getTypeValues();
@@ -218,13 +224,21 @@ class MySQL extends Dialect
 
 		let sql = "ALTER TABLE " . this->prepareTable(tableName, schemaName) . " ADD `" . column->getName() . "` " . this->getColumnDefinition(column);
 
-		let defaultValue = column->getDefault();
-		if ! empty defaultValue {
-			let sql .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+		if column->hasDefault() {
+			let defaultValue = column->getDefault();
+			if memstr(strtoupper(defaultValue), "CURRENT_TIMESTAMP") {
+				let sql .= " DEFAULT CURRENT_TIMESTAMP";
+			} else {
+				let sql .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+			}
 		}
 
 		if column->isNotNull() {
 			let sql .= " NOT NULL";
+		}
+
+		if column->isAutoIncrement() {
+			let sql .= " AUTO_INCREMENT";
 		}
 
 		if column->isFirst() {
@@ -232,7 +246,7 @@ class MySQL extends Dialect
 		} else {
 			let afterPosition = column->getAfterPosition();
 			if afterPosition {
-				let sql .=  " AFTER " . afterPosition;
+				let sql .=  " AFTER `" . afterPosition . "`";
 			}
 		}
 		return sql;
@@ -243,17 +257,34 @@ class MySQL extends Dialect
 	 */
 	public function modifyColumn(string! tableName, string! schemaName, <ColumnInterface> column, <ColumnInterface> currentColumn = null) -> string
 	{
-		var sql, defaultValue;
+		var afterPosition, sql, defaultValue;
 
 		let sql = "ALTER TABLE " . this->prepareTable(tableName, schemaName) . " MODIFY `" . column->getName() . "` " . this->getColumnDefinition(column);
 
-		let defaultValue = column->getDefault();
-		if ! empty defaultValue {
-			let sql .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+		if column->hasDefault() {
+			let defaultValue = column->getDefault();
+			if memstr(strtoupper(defaultValue), "CURRENT_TIMESTAMP") {
+				let sql .= " DEFAULT CURRENT_TIMESTAMP";
+			} else {
+				let sql .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+			}
 		}
 
 		if column->isNotNull() {
 			let sql .= " NOT NULL";
+		}
+
+		if column->isAutoIncrement() {
+			let sql .= " AUTO_INCREMENT";
+		}
+
+		if column->isFirst() {
+			let sql .= " FIRST";
+		} else {
+			let afterPosition = column->getAfterPosition();
+			if afterPosition {
+				let sql .=  " AFTER `" . afterPosition . "`";
+			}
 		}
 		return sql;
 	}
@@ -362,7 +393,7 @@ class MySQL extends Dialect
 		}
 
 		/**
-		 * Create a temporary o normal table
+		 * Create a temporary or normal table
 		 */
 		if temporary {
 			let sql = "CREATE TEMPORARY TABLE " . table . " (\n\t";
@@ -378,9 +409,13 @@ class MySQL extends Dialect
 			/**
 			 * Add a Default clause
 			 */
-			let defaultValue = column->getDefault();
-			if ! empty defaultValue {
-				let columnLine .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+			if column->hasDefault() {
+				let defaultValue = column->getDefault();
+				if memstr(strtoupper(defaultValue), "CURRENT_TIMESTAMP") {
+					let columnLine .= " DEFAULT CURRENT_TIMESTAMP";
+				} else {
+					let columnLine .= " DEFAULT \"" . addcslashes(defaultValue, "\"") . "\"";
+				}
 			}
 
 			/**
@@ -518,8 +553,9 @@ class MySQL extends Dialect
 	 * Generates SQL checking for the existence of a schema.table
 	 *
 	 * <code>
-	 *    echo $dialect->tableExists("posts", "blog");
-	 *    echo $dialect->tableExists("posts");
+	 * echo $dialect->tableExists("posts", "blog");
+	 *
+	 * echo $dialect->tableExists("posts");
 	 * </code>
 	 */
 	public function tableExists(string! tableName, string schemaName = null) -> string
@@ -538,14 +574,16 @@ class MySQL extends Dialect
 		if schemaName {
 			return "SELECT IF(COUNT(*) > 0, 1, 0) FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_NAME`= '" . viewName . "' AND `TABLE_SCHEMA`='" . schemaName . "'";
 		}
-		return "SELECT IF(COUNT(*) > 0, 1, 0) FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_NAME`='" . viewName . "'";
+		return "SELECT IF(COUNT(*) > 0, 1, 0) FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_NAME`='" . viewName . "' AND `TABLE_SCHEMA` = DATABASE()";
 	}
 
 	/**
 	 * Generates SQL describing a table
 	 *
 	 * <code>
-	 *    print_r($dialect->describeColumns("posts"));
+	 * print_r(
+	 *     $dialect->describeColumns("posts")
+	 * );
 	 * </code>
 	 */
 	public function describeColumns(string! table, string schema = null) -> string
@@ -557,7 +595,9 @@ class MySQL extends Dialect
 	 * List all tables in database
 	 *
 	 * <code>
-	 *     print_r($dialect->listTables("blog"))
+	 * print_r(
+	 *     $dialect->listTables("blog")
+	 * );
 	 * </code>
 	 */
 	public function listTables(string schemaName = null) -> string
@@ -576,7 +616,7 @@ class MySQL extends Dialect
 		if schemaName {
 			return "SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_SCHEMA` = '" . schemaName . "' ORDER BY view_name";
 		}
-		return "SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` ORDER BY view_name";
+		return "SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_SCHEMA` = DATABASE() ORDER BY view_name";
 	}
 
 	/**
@@ -592,11 +632,11 @@ class MySQL extends Dialect
 	 */
 	public function describeReferences(string! table, string schema = null) -> string
 	{
-		var sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND ";
+		var sql = "SELECT DISTINCT KCU.TABLE_NAME, KCU.COLUMN_NAME, KCU.CONSTRAINT_NAME, KCU.REFERENCED_TABLE_SCHEMA, KCU.REFERENCED_TABLE_NAME, KCU.REFERENCED_COLUMN_NAME, RC.UPDATE_RULE, RC.DELETE_RULE FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS RC ON RC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND RC.CONSTRAINT_SCHEMA = KCU.CONSTRAINT_SCHEMA WHERE KCU.REFERENCED_TABLE_NAME IS NOT NULL AND ";
 		if schema {
-			let sql .= "CONSTRAINT_SCHEMA = '" . schema . "' AND TABLE_NAME = '" . table . "'";
+			let sql .= "KCU.CONSTRAINT_SCHEMA = '" . schema . "' AND KCU.TABLE_NAME = '" . table . "'";
 		} else {
-			let sql .= "TABLE_NAME = '" . table . "'";
+			let sql .= "KCU.CONSTRAINT_SCHEMA = DATABASE() AND KCU.TABLE_NAME = '" . table . "'";
 		}
 		return sql;
 	}
@@ -610,7 +650,7 @@ class MySQL extends Dialect
 		if schema {
 			return sql . "TABLES.TABLE_SCHEMA = '" . schema . "' AND TABLES.TABLE_NAME = '" . table . "'";
 		}
-		return sql . "TABLES.TABLE_NAME = '" . table . "'";
+		return sql . "TABLES.TABLE_SCHEMA = DATABASE() AND TABLES.TABLE_NAME = '" . table . "'";
 	}
 
 	/**

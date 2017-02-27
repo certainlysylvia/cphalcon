@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -45,22 +45,27 @@ use Phalcon\Di\InjectionAwareInterface;
  * Additionally, this pattern increases testability in the code, thus making it less prone to errors.
  *
  *<code>
- * $di = new \Phalcon\Di();
+ * use Phalcon\Di;
+ * use Phalcon\Http\Request;
  *
- * //Using a string definition
- * $di->set("request", "Phalcon\Http\Request", true);
+ * $di = new Di();
  *
- * //Using an anonymous function
- * $di->set("request", function(){
- *	  return new \Phalcon\Http\Request();
- * }, true);
+ * // Using a string definition
+ * $di->set("request", Request::class, true);
+ *
+ * // Using an anonymous function
+ * $di->setShared(
+ *     "request",
+ *     function () {
+ *         return new Request();
+ *     }
+ * );
  *
  * $request = $di->getRequest();
  *</code>
  */
 class Di implements DiInterface
 {
-
 	/**
 	 * List of registered services
 	 */
@@ -132,10 +137,7 @@ class Di implements DiInterface
 	 */
 	public function setShared(string! name, var definition) -> <ServiceInterface>
 	{
-		var service;
-		let service = new Service(name, definition, true),
-			this->_services[name] = service;
-		return service;
+		return this->set(name, definition, true);
 	}
 
 	/**
@@ -178,7 +180,7 @@ class Di implements DiInterface
 	/**
 	 * Returns a service definition without resolving
 	 */
-	public function getRaw(string! name)
+	public function getRaw(string! name) -> var
 	{
 		var service;
 
@@ -205,51 +207,37 @@ class Di implements DiInterface
 
 	/**
 	 * Resolves the service based on its configuration
-	 * @returm mixed
 	 */
-	public function get(string! name, parameters = null)
+	public function get(string! name, parameters = null) -> var
 	{
-		var service, instance, reflection, eventsManager;
+		var service, eventsManager, instance = null;
 
 		let eventsManager = <ManagerInterface> this->_eventsManager;
 
 		if typeof eventsManager == "object" {
-			eventsManager->fire("di:beforeServiceResolve", this, ["name": name, "parameters": parameters]);
+			let instance = eventsManager->fire(
+				"di:beforeServiceResolve",
+				this,
+				["name": name, "parameters": parameters]
+			);
 		}
 
-		if fetch service, this->_services[name] {
-			/**
-			 * The service is registered in the DI
-			 */
-			let instance = service->resolve(parameters, this);
-		} else {
-			/**
-			 * The DI also acts as builder for any class even if it isn't defined in the DI
-			 */
-			if !class_exists(name) {
-				throw new Exception("Service '" . name . "' wasn't found in the dependency injection container");
-			}
-
-			if typeof parameters == "array" {
-				if count(parameters) {
-					if is_php_version("5.6") {
-						let reflection = new \ReflectionClass(name),
-							instance = reflection->newInstanceArgs(parameters);
-					} else {
-						let instance = create_instance_params(name, parameters);
-					}
-				} else {
-					if is_php_version("5.6") {
-						let reflection = new \ReflectionClass(name),
-							instance = reflection->newInstance();
-					} else {
-						let instance = create_instance(name);
-					}
-				}
+		if typeof instance != "object" {
+			if fetch service, this->_services[name] {
+				/**
+				 * The service is registered in the DI
+				 */
+				let instance = service->resolve(parameters, this);
 			} else {
-				if is_php_version("5.6") {
-					let reflection = new \ReflectionClass(name),
-						instance = reflection->newInstance();
+				/**
+				 * The DI also acts as builder for any class even if it isn't defined in the DI
+				 */
+				if !class_exists(name) {
+					throw new Exception("Service '" . name . "' wasn't found in the dependency injection container");
+				}
+
+				if typeof parameters == "array" && count(parameters) {
+					let instance = create_instance_params(name, parameters);
 				} else {
 					let instance = create_instance(name);
 				}
@@ -281,7 +269,8 @@ class Di implements DiInterface
 	}
 
 	/**
-	 * Resolves a service, the resolved service is stored in the DI, subsequent requests for this service will return the same instance
+	 * Resolves a service, the resolved service is stored in the DI, subsequent
+	 * requests for this service will return the same instance
 	 *
 	 * @param string name
 	 * @param array parameters
@@ -349,12 +338,8 @@ class Di implements DiInterface
 	 * Allows to register a shared service using the array syntax
 	 *
 	 *<code>
-	 *	$di["request"] = new \Phalcon\Http\Request();
+	 * $di["request"] = new \Phalcon\Http\Request();
 	 *</code>
-	 *
-	 * @param string name
-	 * @param mixed definition
-	 * @return boolean
 	 */
 	public function offsetSet(string! name, var definition) -> boolean
 	{
@@ -366,13 +351,10 @@ class Di implements DiInterface
 	 * Allows to obtain a shared service using the array syntax
 	 *
 	 *<code>
-	 *	var_dump($di["request"]);
+	 * var_dump($di["request"]);
 	 *</code>
-	 *
-	 * @param string name
-	 * @return mixed
 	 */
-	public function offsetGet(string! name) -> boolean
+	public function offsetGet(string! name) -> var
 	{
 		return this->getShared(name);
 	}
@@ -387,12 +369,8 @@ class Di implements DiInterface
 
 	/**
 	 * Magic method to get or set services using setters/getters
-	 *
-	 * @param string method
-	 * @param array arguments
-	 * @return mixed
 	 */
-	public function __call(string! method, arguments = null)
+	public function __call(string! method, arguments = null) -> var|null
 	{
 		var instance, possibleService, services, definition;
 
@@ -437,7 +415,7 @@ class Di implements DiInterface
 	}
 
 	/**
-	 * Return the lastest DI created
+	 * Return the latest DI created
 	 */
 	public static function getDefault() -> <DiInterface>
 	{

@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -25,12 +25,21 @@ namespace Phalcon\Db;
  * Allows to define reference constraints on tables
  *
  *<code>
- *	$reference = new \Phalcon\Db\Reference("field_fk", array(
- *		'referencedSchema' => "invoicing",
- *		'referencedTable' => "products",
- *		'columns' => array("product_type", "product_code"),
- *		'referencedColumns' => array("type", "code")
- *	));
+ * $reference = new \Phalcon\Db\Reference(
+ *     "field_fk",
+ *     [
+ *         "referencedSchema"  => "invoicing",
+ *         "referencedTable"   => "products",
+ *         "columns"           => [
+ *             "product_type",
+ *             "product_code",
+ *         ],
+ *         "referencedColumns" => [
+ *             "type",
+ *             "code",
+ *         ],
+ *     ]
+ * );
  *</code>
  */
 class Reference implements ReferenceInterface

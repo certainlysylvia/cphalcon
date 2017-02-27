@@ -32,6 +32,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Mvc_View_Engine) {
 
 	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_view"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
+	zend_class_implements(phalcon_mvc_view_engine_ce TSRMLS_CC, 1, phalcon_mvc_view_engineinterface_ce);
 	return SUCCESS;
 
 }
@@ -60,8 +61,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct) {
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, getContent) {
 
-	int ZEPHIR_LAST_CALL_STATUS;
 	zval *_0;
+	int ZEPHIR_LAST_CALL_STATUS;
 
 	ZEPHIR_MM_GROW();
 
@@ -92,7 +93,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'partialPath' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(partialPath_param) == IS_STRING)) {
 		zephir_get_strval(partialPath, partialPath_param);
 	} else {
@@ -116,6 +116,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial) {
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, getView) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_view");
 

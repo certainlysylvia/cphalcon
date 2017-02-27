@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Annotations\Adapter;
 
 use Phalcon\Annotations\Adapter;
-use Phalcon\Annotations\AdapterInterface;
 use Phalcon\Annotations\Reflection;
 
 /**
@@ -28,7 +27,7 @@ use Phalcon\Annotations\Reflection;
  *
  * Stores the parsed annotations in memory. This adapter is the suitable development/testing
  */
-class Memory extends Adapter implements AdapterInterface
+class Memory extends Adapter
 {
 	/**
 	 * Data
@@ -37,11 +36,8 @@ class Memory extends Adapter implements AdapterInterface
 	protected _data;
 
 	/**
-	* Reads parsed annotations from memory
-	*
-	* @param string key
-	* @return \Phalcon\Annotations\Reflection
-	*/
+	 * Reads parsed annotations from memory
+	 */
 	public function read(string! key) -> <Reflection> | boolean
 	{
 		var data;
@@ -49,6 +45,7 @@ class Memory extends Adapter implements AdapterInterface
 		if fetch data, this->_data[strtolower(key)] {
 			return data;
 		}
+
 		return false;
 	}
 

@@ -36,20 +36,16 @@ ZEPHIR_INIT_CLASS(Phalcon_Annotations_Adapter_Memory) {
 	 */
 	zend_declare_property_null(phalcon_annotations_adapter_memory_ce, SL("_data"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
-	zend_class_implements(phalcon_annotations_adapter_memory_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
 	return SUCCESS;
 
 }
 
 /**
  * Reads parsed annotations from memory
- *
- * @param string key
- * @return \Phalcon\Annotations\Reflection
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read) {
 
-	zval *key_param = NULL, *data, *_0, *_1;
+	zval *key_param = NULL, *data = NULL, *_0, *_1;
 	zval *key = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -59,7 +55,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -83,7 +78,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read) {
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write) {
 
-	zval *key_param = NULL, *data, *lowercasedKey;
+	zval *key_param = NULL, *data, *lowercasedKey = NULL;
 	zval *key = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -93,7 +88,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {

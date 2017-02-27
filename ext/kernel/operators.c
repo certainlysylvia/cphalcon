@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Zephir Language                                                        |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2015 Zephir Team (http://www.zephir-lang.com)       |
+  | Copyright (c) 2011-2016 Zephir Team (http://www.zephir-lang.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -372,7 +372,8 @@ int zephir_add_function_ex(zval *result, zval *op1, zval *op2 TSRMLS_DC) {
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = add_function(result, op1, op2 TSRMLS_CC);
+
+	status = fast_add_function(result, op1, op2 TSRMLS_CC);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
@@ -442,11 +443,8 @@ long zephir_get_intval_ex(const zval *op) {
 	switch (Z_TYPE_P(op)) {
         case IS_ARRAY:
             return zend_hash_num_elements(Z_ARRVAL_P(op)) ? 1 : 0;
-            break;
 
-#if PHP_VERSION_ID > 50400
 	    case IS_CALLABLE:
-#endif
 	    case IS_RESOURCE:
 	    case IS_OBJECT:
 	        return 1;
@@ -480,6 +478,35 @@ long zephir_get_intval_ex(const zval *op) {
 	return 0;
 }
 
+long zephir_get_charval_ex(const zval *op) {
+
+	switch (Z_TYPE_P(op)) {
+        case IS_ARRAY:
+	    case IS_CALLABLE:
+	    case IS_RESOURCE:
+	    case IS_OBJECT:
+	        return 0;
+
+		case IS_LONG:
+			return Z_LVAL_P(op);
+
+		case IS_BOOL:
+			return Z_BVAL_P(op);
+
+		case IS_DOUBLE:
+			return (long) Z_DVAL_P(op);
+
+		case IS_STRING: {
+			if (Z_STRLEN_P(op) > 0) {
+				return Z_STRVAL_P(op)[0];
+			}
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
 /**
  * Returns the long value of a zval
  */
@@ -493,9 +520,8 @@ double zephir_get_doubleval_ex(const zval *op) {
         case IS_ARRAY:
             return zend_hash_num_elements(Z_ARRVAL_P(op)) ? (double) 1 : 0;
             break;
-#if PHP_VERSION_ID > 50400
+
 	    case IS_CALLABLE:
-#endif
 	    case IS_RESOURCE:
 	    case IS_OBJECT:
 	        return (double) 1;
@@ -525,43 +551,8 @@ double zephir_get_doubleval_ex(const zval *op) {
 /**
  * Returns the long value of a zval
  */
-zend_bool zephir_get_boolval_ex(const zval *op) {
-
-	int type;
-	long long_value = 0;
-	double double_value = 0;
-
-	switch (Z_TYPE_P(op)) {
-        case IS_ARRAY:
-            return zend_hash_num_elements(Z_ARRVAL_P(op)) ? (zend_bool) 1 : 0;
-            break;
-#if PHP_VERSION_ID > 50400
-	    case IS_CALLABLE:
-#endif
-	    case IS_RESOURCE:
-	    case IS_OBJECT:
-	        return (zend_bool) 1;
-		case IS_LONG:
-			return (Z_LVAL_P(op) ? (zend_bool) 1 : 0);
-		case IS_BOOL:
-			return Z_BVAL_P(op);
-		case IS_DOUBLE:
-			return (Z_DVAL_P(op) ? (zend_bool) 1 : 0);
-		case IS_STRING:
-			if ((type = is_numeric_string(Z_STRVAL_P(op), Z_STRLEN_P(op), &long_value, &double_value, 0))) {
-				if (type == IS_LONG) {
-					return (long_value ? (zend_bool) 1 : 0);
-				} else {
-					if (type == IS_DOUBLE) {
-						return (double_value ? (zend_bool) 1 : 0);
-					} else {
-						return 0;
-					}
-				}
-			}
-	}
-
-	return 0;
+zend_bool zephir_get_boolval_ex(zval *op) {
+	return (zend_bool) zend_is_true(op);
 }
 
 /**
@@ -594,12 +585,7 @@ int zephir_is_numeric_ex(const zval *op) {
  */
 int zephir_is_equal(zval *op1, zval *op2 TSRMLS_DC) {
 	zval result;
-	#if PHP_VERSION_ID < 50400
-	is_equal_function(&result, op1, op2 TSRMLS_CC);
-	return Z_BVAL(result);
-	#else
 	return fast_equal_function(&result, op1, op2 TSRMLS_CC);
-	#endif
 }
 
 /**
@@ -607,12 +593,7 @@ int zephir_is_equal(zval *op1, zval *op2 TSRMLS_DC) {
  */
 int zephir_less(zval *op1, zval *op2 TSRMLS_DC) {
 	zval result;
-	#if PHP_VERSION_ID < 50400
-	is_smaller_function(&result, op1, op2 TSRMLS_CC);
-	return Z_BVAL(result);
-	#else
 	return fast_is_smaller_function(&result, op1, op2 TSRMLS_CC);
-	#endif
 }
 
 /**

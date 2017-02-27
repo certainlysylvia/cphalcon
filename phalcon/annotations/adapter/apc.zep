@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Annotations\Adapter;
 
 use Phalcon\Annotations\Adapter;
-use Phalcon\Annotations\AdapterInterface;
 use Phalcon\Annotations\Reflection;
 
 /**
@@ -29,10 +28,12 @@ use Phalcon\Annotations\Reflection;
  * Stores the parsed annotations in APC. This adapter is suitable for production
  *
  *<code>
- * $annotations = new \Phalcon\Annotations\Adapter\Apc();
+ * use Phalcon\Annotations\Adapter\Apc;
+ *
+ * $annotations = new Apc();
  *</code>
  */
-class Apc extends Adapter implements AdapterInterface
+class Apc extends Adapter
 {
 
 	protected _prefix = "";
@@ -60,9 +61,6 @@ class Apc extends Adapter implements AdapterInterface
 
 	/**
 	 * Reads parsed annotations from APC
-	 *
-	 * @param string key
-	 * @return \Phalcon\Annotations\Reflection
 	 */
 	public function read(string! key) -> <Reflection> | boolean
 	{

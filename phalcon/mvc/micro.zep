@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,16 +20,16 @@
 namespace Phalcon\Mvc;
 
 use Phalcon\DiInterface;
+use Phalcon\Di\Injectable;
+use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\Micro\Exception;
-use Phalcon\Mvc\Router\RouteInterface;
-use Phalcon\Mvc\Micro\MiddlewareInterface;
+use Phalcon\Di\ServiceInterface;
 use Phalcon\Mvc\Micro\Collection;
-use Phalcon\Mvc\Micro\CollectionInterface;
 use Phalcon\Mvc\Micro\LazyLoader;
 use Phalcon\Http\ResponseInterface;
-use Phalcon\Di\ServiceInterface;
-use Phalcon\Di\FactoryDefault;
-use Phalcon\Di\Injectable;
+use Phalcon\Mvc\Router\RouteInterface;
+use Phalcon\Mvc\Micro\MiddlewareInterface;
+use Phalcon\Mvc\Micro\CollectionInterface;
 
 /**
  * Phalcon\Mvc\Micro
@@ -39,15 +39,16 @@ use Phalcon\Di\Injectable;
  * to small applications, APIs and prototypes in a practical way.
  *
  *<code>
- *
  * $app = new \Phalcon\Mvc\Micro();
  *
- * $app->get('/say/welcome/{name}', function ($name) {
- *    echo "<h1>Welcome $name!</h1>";
- * });
+ * $app->get(
+ *     "/say/welcome/{name}",
+ *     function ($name) {
+ *         echo "<h1>Welcome $name!</h1>";
+ *     }
+ * );
  *
  * $app->handle();
- *
  *</code>
  */
 class Micro extends Injectable implements \ArrayAccess
@@ -55,7 +56,7 @@ class Micro extends Injectable implements \ArrayAccess
 
 	protected _dependencyInjector;
 
-	protected _handlers;
+	protected _handlers = [];
 
 	protected _router;
 
@@ -579,7 +580,8 @@ class Micro extends Injectable implements \ArrayAccess
 	{
 		var dependencyInjector, eventsManager, status = null, router, matchedRoute,
 			handler, beforeHandlers, params, returnedValue, e, errorHandler,
-			afterHandlers, notFoundHandler, finishHandlers, finish, before, after;
+			afterHandlers, notFoundHandler, finishHandlers, finish, before, after,
+			response;
 
 		let dependencyInjector = this->_dependencyInjector;
 		if typeof dependencyInjector != "object" {
@@ -603,7 +605,7 @@ class Micro extends Injectable implements \ArrayAccess
 			/**
 			 * Handling routing information
 			 */
-			let router = dependencyInjector->getShared("router");
+			let router = <RouterInterface> dependencyInjector->getShared("router");
 
 			/**
 			 * Handle the URI as normal
@@ -686,10 +688,18 @@ class Micro extends Injectable implements \ArrayAccess
 					}
 				}
 
+				let params = router->getParams();
+
+				/**
+				 * Bound the app to the handler
+				 */
+				if typeof handler == "object" && handler instanceof \Closure {
+					let handler = \Closure::bind(handler, this);
+				}
+
 				/**
 				 * Calling the Handler in the PHP userland
 				 */
-				let params = router->getParams();
 				let returnedValue = call_user_func_array(handler, params);
 
 				/**
@@ -873,6 +883,15 @@ class Micro extends Injectable implements \ArrayAccess
 		}
 
 		/**
+		 * Check if the returned value is a string and take it as response body
+		 */
+		if typeof returnedValue == "string" {
+			let response = <ResponseInterface> dependencyInjector->getShared("response");
+			response->setContent(returnedValue);
+			response->send();
+		}
+
+		/**
 		 * Check if the returned object is already a response
 		 */
 		if typeof returnedValue == "object" {
@@ -940,7 +959,7 @@ class Micro extends Injectable implements \ArrayAccess
 	 * Allows to register a shared service in the internal services container using the array syntax
 	 *
 	 *<code>
-	 *	$app['request'] = new \Phalcon\Http\Request();
+	 *	$app["request"] = new \Phalcon\Http\Request();
 	 *</code>
 	 *
 	 * @param string alias
@@ -955,7 +974,9 @@ class Micro extends Injectable implements \ArrayAccess
 	 * Allows to obtain a shared service in the internal services container using the array syntax
 	 *
 	 *<code>
-	 *	var_dump($di['request']);
+	 * var_dump(
+	 *     $app["request"]
+	 * );
 	 *</code>
 	 *
 	 * @param string alias
@@ -1014,10 +1035,8 @@ class Micro extends Injectable implements \ArrayAccess
 
 	/**
 	 * Returns the internal handlers attached to the application
-	 *
-	 * @return array
 	 */
-	public function getHandlers()
+	public function getHandlers() -> array
 	{
 		return this->_handlers;
 	}

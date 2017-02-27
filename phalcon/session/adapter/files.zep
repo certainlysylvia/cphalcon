@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -19,7 +19,6 @@
 
 namespace Phalcon\Session\Adapter;
 
-use Phalcon\Session\AdapterInterface;
 use Phalcon\Session\Adapter;
 
 /**
@@ -28,18 +27,21 @@ use Phalcon\Session\Adapter;
  * This adapter store sessions in plain files
  *
  *<code>
- * $session = new \Phalcon\Session\Adapter\Files(array(
- *    'uniqueId' => 'my-private-app'
- * ));
+ * use Phalcon\Session\Adapter\Files;
+ *
+ * $session = new Files(
+ *     [
+ *         "uniqueId" => "my-private-app",
+ *     ]
+ * );
  *
  * $session->start();
  *
- * $session->set('var', 'some-value');
+ * $session->set("var", "some-value");
  *
- * echo $session->get('var');
+ * echo $session->get("var");
  *</code>
  */
-class Files extends Adapter implements AdapterInterface
+class Files extends Adapter
 {
-
 }

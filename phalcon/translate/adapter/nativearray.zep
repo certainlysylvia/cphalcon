@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Translate\Adapter;
 
 use Phalcon\Translate\Exception;
-use Phalcon\Translate\AdapterInterface;
 use Phalcon\Translate\Adapter;
 
 /**
@@ -28,7 +27,7 @@ use Phalcon\Translate\Adapter;
  *
  * Allows to define translation lists using PHP arrays
  */
-class NativeArray extends Adapter implements AdapterInterface, \ArrayAccess
+class NativeArray extends Adapter implements \ArrayAccess
 {
 
 	protected _translate;

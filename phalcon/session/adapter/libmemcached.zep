@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,7 +21,6 @@ namespace Phalcon\Session\Adapter;
 
 use Phalcon\Session\Adapter;
 use Phalcon\Session\Exception;
-use Phalcon\Session\AdapterInterface;
 use Phalcon\Cache\Backend\Libmemcached;
 use Phalcon\Cache\Frontend\Data as FrontendData;
 
@@ -31,38 +30,47 @@ use Phalcon\Cache\Frontend\Data as FrontendData;
  * This adapter store sessions in libmemcached
  *
  *<code>
- * $session = new Phalcon\Session\Adapter\Libmemcached(array(
- *     'servers' => array(
- *         array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
- *     ),
- *     'client' => array(
- *         Memcached::OPT_HASH => Memcached::HASH_MD5,
- *         Memcached::OPT_PREFIX_KEY => 'prefix.',
- *     ),
- *    'lifetime' => 3600,
- *    'prefix' => 'my_'
- * ));
+ * use Phalcon\Session\Adapter\Libmemcached;
+ *
+ * $session = new Libmemcached(
+ *     [
+ *         "servers" => [
+ *             [
+ *                 "host"   => "localhost",
+ *                 "port"   => 11211,
+ *                 "weight" => 1,
+ *             ],
+ *         ],
+ *         "client" => [
+ *             \Memcached::OPT_HASH       => \Memcached::HASH_MD5,
+ *             \Memcached::OPT_PREFIX_KEY => "prefix.",
+ *         ],
+ *         "lifetime" => 3600,
+ *         "prefix"   => "my_",
+ *     ]
+ * );
  *
  * $session->start();
  *
- * $session->set('var', 'some-value');
+ * $session->set("var", "some-value");
  *
- * echo $session->get('var');
+ * echo $session->get("var");
  *</code>
  */
-class Libmemcached extends Adapter implements AdapterInterface
+class Libmemcached extends Adapter
 {
-
 	protected _libmemcached = null { get };
 
 	protected _lifetime = 8600 { get };
 
 	/**
 	 * Phalcon\Session\Adapter\Libmemcached constructor
+	 *
+	 * @throws \Phalcon\Session\Exception
 	 */
 	public function __construct(array options)
 	{
-		var servers, client, lifetime, prefix, statsKey;
+		var servers, client, lifetime, prefix, statsKey, persistentId;
 
 		if !fetch servers, options["servers"] {
 			throw new Exception("No servers given in options");
@@ -76,14 +84,19 @@ class Libmemcached extends Adapter implements AdapterInterface
 			let lifetime = 8600;
 		}
 
-		let this->_lifetime = lifetime;
+		// Memcached has an internal max lifetime of 30 days
+		let this->_lifetime = min(lifetime, 2592000);
 
 		if !fetch prefix, options["prefix"] {
 			let prefix = null;
 		}
 
 		if !fetch statsKey, options["statsKey"] {
-			let statsKey = null;
+			let statsKey = "";
+		}
+
+		if !fetch persistentId, options["persistent_id"] {
+			let persistentId = "phalcon-session";
 		}
 
 		let this->_libmemcached = new Libmemcached(
@@ -92,7 +105,8 @@ class Libmemcached extends Adapter implements AdapterInterface
 				"servers":  servers,
 				"client":   client,
 				"prefix":   prefix,
-				"statsKey": statsKey
+				"statsKey": statsKey,
+				"persistent_id": persistentId
 			]
 		);
 
@@ -120,38 +134,38 @@ class Libmemcached extends Adapter implements AdapterInterface
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param string sessionId
-	 * @return mixed
 	 */
-	public function read(sessionId)
+	public function read(string sessionId) -> string
 	{
-		return this->_libmemcached->get(sessionId, this->_lifetime);
+		return (string) this->_libmemcached->get(sessionId, this->_lifetime);
 	}
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param string sessionId
-	 * @param string data
 	 */
-	public function write(sessionId, data)
+	public function write(string sessionId, string data) -> boolean
 	{
-		this->_libmemcached->save(sessionId, data, this->_lifetime);
+		return this->_libmemcached->save(sessionId, data, this->_lifetime);
 	}
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * @param  string  sessionId
-	 * @return boolean
 	 */
-	public function destroy(sessionId = null)
+	public function destroy(string sessionId = null) -> boolean
 	{
+		var id, key;
+
 		if sessionId === null {
-			let sessionId = this->getId();
+			let id = this->getId();
+		} else {
+			let id = sessionId;
 		}
-		return this->_libmemcached->delete(sessionId);
+
+		for key, _ in _SESSION {
+			unset _SESSION[key];
+		}
+
+		return this->_libmemcached->exists(id) ? this->_libmemcached->delete(id) : true;
 	}
 
 	/**

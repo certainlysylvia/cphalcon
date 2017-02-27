@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -73,7 +73,7 @@ class Cookie implements CookieInterface, InjectionAwareInterface
 		let this->_name = name;
 
 		if value !== null {
-			let this->_value = value;
+			this->setValue(value);
 		}
 
 		let this->_expire = expire;
@@ -346,7 +346,7 @@ class Cookie implements CookieInterface, InjectionAwareInterface
 			httpOnly = this->_httpOnly;
 
 		let dependencyInjector = <DiInterface> this->_dependencyInjector;
-		if typeof dependencyInjector != "object" {
+		if typeof dependencyInjector == "object" {
 			let session = <SessionInterface> dependencyInjector->getShared("session");
 			if session->isStarted() {
 				session->remove("_PHCOOKIE_" . name);

@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Mvc\Model\MetaData;
 
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\MetaDataInterface;
 use Phalcon\Mvc\Model\Exception;
 
 /**
@@ -29,8 +28,10 @@ use Phalcon\Mvc\Model\Exception;
  * Stores model meta-data in memory. Data will be erased when the request finishes
  *
  */
-class Memory extends MetaData implements MetaDataInterface
+class Memory extends MetaData
 {
+
+	protected _metaData = [];
 
 	/**
 	 * Phalcon\Mvc\Model\MetaData\Memory constructor
@@ -39,7 +40,6 @@ class Memory extends MetaData implements MetaDataInterface
 	 */
 	public function __construct(var options = null)
 	{
-		let this->_metaData = [];
 	}
 
 	/**

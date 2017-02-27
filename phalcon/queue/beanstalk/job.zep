@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (http://www.phalconphp.com)       |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,6 +20,7 @@
 namespace Phalcon\Queue\Beanstalk;
 
 use Phalcon\Queue\Beanstalk;
+use Phalcon\Queue\Beanstalk\Exception;
 
 /**
  * Phalcon\Queue\Beanstalk\Job
@@ -28,8 +29,14 @@ use Phalcon\Queue\Beanstalk;
  */
 class Job
 {
+	/**
+	 * @var string
+	 */
 	protected _id { get };
 
+	/**
+	 * @var mixed
+	 */
 	protected _body { get };
 
 	protected _queue;
@@ -49,7 +56,7 @@ class Job
 	 */
 	public function delete() -> boolean
 	{
- 		var queue;
+		var queue;
 
 		let queue = this->_queue;
 		queue->write("delete " . this->_id);
@@ -115,7 +122,7 @@ class Job
 	}
 
 	/**
-	 * Get stats of the job.
+	 * Gives statistical information about the specified job if it exists.
 	 */
 	public function stats() -> boolean|array
 	{
@@ -138,7 +145,9 @@ class Job
 	public function __wakeup()
 	{
 		if typeof this->_id != "string" {
-			throw new \Phalcon\Exception("Unexpected inconsistency in %s - possible break-in attempt!", "Phalcon\\Queue\\Beanstalk\\Job::__wakeup()");
+			throw new Exception(
+				"Unexpected inconsistency in Phalcon\\Queue\\Beanstalk\\Job::__wakeup() - possible break-in attempt!"
+			);
 		}
 	}
 }

@@ -29,7 +29,9 @@
  * Stores the parsed annotations in APC. This adapter is suitable for production
  *
  *<code>
- * $annotations = new \Phalcon\Annotations\Adapter\Apc();
+ * use Phalcon\Annotations\Adapter\Apc;
+ *
+ * $annotations = new Apc();
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Annotations_Adapter_Apc) {
@@ -40,7 +42,6 @@ ZEPHIR_INIT_CLASS(Phalcon_Annotations_Adapter_Apc) {
 
 	zend_declare_property_long(phalcon_annotations_adapter_apc_ce, SL("_ttl"), 172800, ZEND_ACC_PROTECTED TSRMLS_CC);
 
-	zend_class_implements(phalcon_annotations_adapter_apc_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
 	return SUCCESS;
 
 }
@@ -52,7 +53,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Annotations_Adapter_Apc) {
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Apc, __construct) {
 
-	zval *options = NULL, *prefix, *ttl;
+	zval *options = NULL, *prefix = NULL, *ttl = NULL;
 
 	zephir_fetch_params(0, 0, 1, &options);
 
@@ -74,9 +75,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, __construct) {
 
 /**
  * Reads parsed annotations from APC
- *
- * @param string key
- * @return \Phalcon\Annotations\Reflection
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read) {
 
@@ -91,7 +89,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -105,7 +102,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read) {
 	ZEPHIR_INIT_VAR(_2);
 	ZEPHIR_CONCAT_SVV(_2, "_PHAN", _1, key);
 	zephir_fast_strtolower(_0, _2);
-	ZEPHIR_RETURN_CALL_FUNCTION("apc_fetch", NULL, 81, _0);
+	ZEPHIR_RETURN_CALL_FUNCTION("apc_fetch", NULL, 88, _0);
 	zephir_check_call_status();
 	RETURN_MM();
 
@@ -127,7 +124,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, write) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'key' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(key_param) == IS_STRING)) {
 		zephir_get_strval(key, key_param);
 	} else {
@@ -142,7 +138,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, write) {
 	ZEPHIR_CONCAT_SVV(_2, "_PHAN", _1, key);
 	zephir_fast_strtolower(_0, _2);
 	_3 = zephir_fetch_nproperty_this(this_ptr, SL("_ttl"), PH_NOISY_CC);
-	ZEPHIR_RETURN_CALL_FUNCTION("apc_store", NULL, 82, _0, data, _3);
+	ZEPHIR_RETURN_CALL_FUNCTION("apc_store", NULL, 89, _0, data, _3);
 	zephir_check_call_status();
 	RETURN_MM();
 

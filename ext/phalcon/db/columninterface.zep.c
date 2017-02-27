@@ -26,11 +26,6 @@ ZEPHIR_INIT_CLASS(Phalcon_Db_ColumnInterface) {
 }
 
 /**
- * Phalcon\Db\ColumnInterface constructor
- */
-ZEPHIR_DOC_METHOD(Phalcon_Db_ColumnInterface, __construct);
-
-/**
  * Returns schema's table related to column
  *
  * @return string
@@ -141,6 +136,11 @@ ZEPHIR_DOC_METHOD(Phalcon_Db_ColumnInterface, getBindType);
  * @return int
  */
 ZEPHIR_DOC_METHOD(Phalcon_Db_ColumnInterface, getDefault);
+
+/**
+ * Check whether column has default value
+ */
+ZEPHIR_DOC_METHOD(Phalcon_Db_ColumnInterface, hasDefault);
 
 /**
  * Restores the internal state of a Phalcon\Db\Column object

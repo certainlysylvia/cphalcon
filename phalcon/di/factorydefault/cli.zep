@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -23,7 +23,7 @@ use Phalcon\Di\Service;
 use Phalcon\Di\FactoryDefault;
 
  /**
- * Phalcon\Di\FactoryDefault\CLI
+ * Phalcon\Di\FactoryDefault\Cli
  *
  * This is a variant of the standard Phalcon\Di. By default it automatically
  * registers all the services provided by the framework.
@@ -34,15 +34,15 @@ class Cli extends FactoryDefault
 {
 
 	/**
-	 * Phalcon\Di\FactoryDefault\CLI constructor
+	 * Phalcon\Di\FactoryDefault\Cli constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct();
 
 		let this->_services = [
-			"router":             new Service("router", "Phalcon\\CLI\\Router", true),
-			"dispatcher":         new Service("dispatcher", "Phalcon\\CLI\\Dispatcher", true),
+			"router":             new Service("router", "Phalcon\\Cli\\Router", true),
+			"dispatcher":         new Service("dispatcher", "Phalcon\\Cli\\Dispatcher", true),
 			"modelsManager":      new Service("modelsManager", "Phalcon\\Mvc\\Model\\Manager", true),
 			"modelsMetadata":     new Service("modelsMetadata", "Phalcon\\Mvc\\Model\\MetaData\\Memory", true),
 			"filter":             new Service("filter", "Phalcon\\Filter", true),

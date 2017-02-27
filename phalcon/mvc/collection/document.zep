@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -75,7 +75,7 @@ class Document implements EntityInterface, \ArrayAccess
 	 * Reads an attribute value by its name
 	 *
 	 *<code>
-	 *  echo $robot->readAttribute('name');
+	 *  echo $robot->readAttribute("name");
 	 *</code>
 	 *
 	 * @param string attribute
@@ -94,7 +94,7 @@ class Document implements EntityInterface, \ArrayAccess
 	 * Writes an attribute value by its name
 	 *
 	 *<code>
-	 *  $robot->writeAttribute('name', 'Rosey');
+	 *  $robot->writeAttribute("name", "Rosey");
 	 *</code>
 	 *
 	 * @param string attribute

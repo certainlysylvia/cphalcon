@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -138,7 +138,7 @@ class Route
 			}
 		}
 
-		// Check if the pattern has parantheses in order to add the regex delimiters
+		// Check if the pattern has parentheses in order to add the regex delimiters
 		if memstr(pattern, "(") {
 			return "#^" . pattern . "$#";
 		}
@@ -432,9 +432,12 @@ class Route
 	 * Sets the route's name
 	 *
 	 *<code>
-	 * $router->add('/about', array(
-	 *     'controller' => 'about'
-	 * ))->setName('about');
+	 * $router->add(
+	 *     "/about",
+	 *     [
+	 *         "controller" => "about",
+	 *     ]
+	 * )->setName("about");
 	 *</code>
 	 */
 	public function setName(string! name) -> <Route>

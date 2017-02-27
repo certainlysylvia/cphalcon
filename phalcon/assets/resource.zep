@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -25,20 +25,34 @@ namespace Phalcon\Assets;
  * Represents an asset resource
  *
  *<code>
- * $resource = new \Phalcon\Assets\Resource('js', 'javascripts/jquery.js');
+ * $resource = new \Phalcon\Assets\Resource("js", "javascripts/jquery.js");
  *</code>
  */
 class $Resource
 {
-
+	/**
+	 * @var string
+	 */
 	protected _type { get };
 
+	/**
+	 * @var string
+	 */
 	protected _path { get };
 
+	/**
+	 * @var boolean
+	 */
 	protected _local { get };
 
+	/**
+	 * @var boolean
+	 */
 	protected _filter { get };
 
+	/**
+	 * @var array | null
+	 */
 	protected _attributes { get };
 
 	protected _sourcePath { get };

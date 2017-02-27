@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,7 +21,6 @@ namespace Phalcon\Mvc\Collection\Behavior;
 
 use Phalcon\Mvc\CollectionInterface;
 use Phalcon\Mvc\Collection\Behavior;
-use Phalcon\Mvc\Collection\BehaviorInterface;
 use Phalcon\Mvc\Collection\Exception;
 
 /**
@@ -30,7 +29,7 @@ use Phalcon\Mvc\Collection\Exception;
  * Instead of permanently delete a record it marks the record as
  * deleted changing the value of a flag column
  */
-class SoftDelete extends Behavior implements BehaviorInterface
+class SoftDelete extends Behavior
 {
 
 	/**

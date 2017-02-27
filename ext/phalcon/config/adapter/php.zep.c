@@ -29,26 +29,28 @@
  *
  *<code>
  *<?php
- *return array(
- * 'database' => array(
- *     'adapter' => 'Mysql',
- *     'host' => 'localhost',
- *     'username' => 'scott',
- *     'password' => 'cheetah',
- *     'dbname' => 'test_db'
- * ),
  *
- * 'phalcon' => array(
- *    'controllersDir' => '../app/controllers/',
- *    'modelsDir' => '../app/models/',
- *    'viewsDir' => '../app/views/'
- *));
+ * return [
+ *     "database" => [
+ *         "adapter"  => "Mysql",
+ *         "host"     => "localhost",
+ *         "username" => "scott",
+ *         "password" => "cheetah",
+ *         "dbname"   => "test_db",
+ *     ],
+ *     "phalcon" => [
+ *         "controllersDir" => "../app/controllers/",
+ *         "modelsDir"      => "../app/models/",
+ *         "viewsDir"       => "../app/views/",
+ *     ],
+ * ];
  *</code>
  *
  * You can read it as follows:
  *
  *<code>
- * $config = new Phalcon\Config\Adapter\Php("path/config.php");
+ * $config = new \Phalcon\Config\Adapter\Php("path/config.php");
+ *
  * echo $config->phalcon->controllersDir;
  * echo $config->database->username;
  *</code>
@@ -78,7 +80,6 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, __construct) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'filePath' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(filePath_param) == IS_STRING)) {
 		zephir_get_strval(filePath, filePath_param);
 	} else {
@@ -91,7 +92,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, __construct) {
 	if (zephir_require_zval_ret(&_1, filePath TSRMLS_CC) == FAILURE) {
 		RETURN_MM_NULL();
 	}
-	ZEPHIR_CALL_PARENT(NULL, phalcon_config_adapter_php_ce, this_ptr, "__construct", &_0, 22, _1);
+	ZEPHIR_CALL_PARENT(NULL, phalcon_config_adapter_php_ce, this_ptr, "__construct", &_0, 19, _1);
 	zephir_check_call_status();
 	ZEPHIR_MM_RESTORE();
 

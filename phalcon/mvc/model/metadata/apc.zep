@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Mvc\Model\MetaData;
 
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\MetaDataInterface;
 use Phalcon\Mvc\Model\Exception;
 
 /**
@@ -33,18 +32,22 @@ use Phalcon\Mvc\Model\Exception;
  * You can query the meta-data by printing apc_fetch('$PMM$') or apc_fetch('$PMM$my-app-id')
  *
  *<code>
- *	$metaData = new \Phalcon\Mvc\Model\Metadata\Apc(array(
- *		'prefix' => 'my-app-id',
- *		'lifetime' => 86400
- *	));
+ * $metaData = new \Phalcon\Mvc\Model\Metadata\Apc(
+ *     [
+ *         "prefix"   => "my-app-id",
+ *         "lifetime" => 86400,
+ *     ]
+ * );
  *</code>
  */
-class Apc extends MetaData implements MetaDataInterface
+class Apc extends MetaData
 {
 
 	protected _prefix = "";
 
 	protected _ttl = 172800;
+
+	protected _metaData = [];
 
 	/**
 	 * Phalcon\Mvc\Model\MetaData\Apc constructor
@@ -63,8 +66,6 @@ class Apc extends MetaData implements MetaDataInterface
 				let this->_ttl = ttl;
 			}
 		}
-
-		let this->_metaData = [];
 	}
 
 	/**

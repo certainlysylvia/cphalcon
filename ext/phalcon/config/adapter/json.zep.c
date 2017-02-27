@@ -36,6 +36,7 @@
  *
  *<code>
  * $config = new Phalcon\Config\Adapter\Json("path/config.json");
+ *
  * echo $config->phalcon->baseuri;
  * echo $config->models->metadata;
  *</code>
@@ -65,7 +66,6 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, __construct) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'filePath' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(filePath_param) == IS_STRING)) {
 		zephir_get_strval(filePath, filePath_param);
 	} else {
@@ -78,7 +78,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, __construct) {
 	ZEPHIR_INIT_VAR(_2);
 	zephir_file_get_contents(_2, filePath TSRMLS_CC);
 	zephir_json_decode(_1, &(_1), _2, zephir_get_intval(ZEPHIR_GLOBAL(global_true))  TSRMLS_CC);
-	ZEPHIR_CALL_PARENT(NULL, phalcon_config_adapter_json_ce, this_ptr, "__construct", &_0, 22, _1);
+	ZEPHIR_CALL_PARENT(NULL, phalcon_config_adapter_json_ce, this_ptr, "__construct", &_0, 19, _1);
 	zephir_check_call_status();
 	ZEPHIR_MM_RESTORE();
 

@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -20,7 +20,6 @@
 namespace Phalcon\Mvc\Model\MetaData;
 
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\MetaDataInterface;
 use Phalcon\Mvc\Model\Exception;
 
 /**
@@ -29,15 +28,19 @@ use Phalcon\Mvc\Model\Exception;
  * Stores model meta-data in PHP files.
  *
  *<code>
- * $metaData = new \Phalcon\Mvc\Model\Metadata\Files(array(
- *    'metaDataDir' => 'app/cache/metadata/'
- * ));
+ * $metaData = new \Phalcon\Mvc\Model\Metadata\Files(
+ *     [
+ *         "metaDataDir" => "app/cache/metadata/",
+ *     ]
+ * );
  *</code>
  */
-class Files extends MetaData implements MetaDataInterface
+class Files extends MetaData
 {
 
 	protected _metaDataDir = "./";
+
+	protected _metaData = [];
 
 	/**
 	 * Phalcon\Mvc\Model\MetaData\Files constructor
@@ -52,7 +55,6 @@ class Files extends MetaData implements MetaDataInterface
 				let this->_metaDataDir = metaDataDir;
 			}
 		}
-		let this->_metaData = [];
 	}
 
 	/**

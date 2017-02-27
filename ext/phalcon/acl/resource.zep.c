@@ -40,6 +40,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Acl_Resource) {
 	 */
 	zend_declare_property_null(phalcon_acl_resource_ce, SL("_description"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
+	zend_class_implements(phalcon_acl_resource_ce TSRMLS_CC, 1, phalcon_acl_resourceinterface_ce);
 	return SUCCESS;
 
 }
@@ -49,6 +50,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Acl_Resource) {
  */
 PHP_METHOD(Phalcon_Acl_Resource, getName) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_name");
 
@@ -59,6 +61,7 @@ PHP_METHOD(Phalcon_Acl_Resource, getName) {
  */
 PHP_METHOD(Phalcon_Acl_Resource, __toString) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_name");
 
@@ -69,6 +72,7 @@ PHP_METHOD(Phalcon_Acl_Resource, __toString) {
  */
 PHP_METHOD(Phalcon_Acl_Resource, getDescription) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_description");
 
@@ -89,7 +93,6 @@ PHP_METHOD(Phalcon_Acl_Resource, __construct) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'name' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(name_param) == IS_STRING)) {
 		zephir_get_strval(name, name_param);
 	} else {
@@ -109,7 +112,7 @@ PHP_METHOD(Phalcon_Acl_Resource, __construct) {
 		return;
 	}
 	zephir_update_property_this(this_ptr, SL("_name"), name TSRMLS_CC);
-	if (description && Z_STRLEN_P(description)) {
+	if (!(!description) && Z_STRLEN_P(description)) {
 		zephir_update_property_this(this_ptr, SL("_description"), description TSRMLS_CC);
 	}
 	ZEPHIR_MM_RESTORE();

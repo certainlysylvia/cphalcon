@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -30,8 +30,9 @@ use Phalcon\Config\Exception;
  * Given the following configuration file:
  *
  *<code>
- * phalcon
- *   baseuri: /phalcon/
+ * phalcon:
+ *   baseuri:        /phalcon/
+ *   controllersDir: !approot  /app/controllers/
  * models:
  *   metadata: memory
  *</code>
@@ -39,11 +40,24 @@ use Phalcon\Config\Exception;
  * You can read it as follows:
  *
  *<code>
- * $config = new Phalcon\Config\Adapter\Yaml("path/config.yaml");
+ * define(
+ *     "APPROOT",
+ *     dirname(__DIR__)
+ * );
+ *
+ * $config = new \Phalcon\Config\Adapter\Yaml(
+ *     "path/config.yaml",
+ *     [
+ *         "!approot" => function($value) {
+ *             return APPROOT . $value;
+ *         },
+ *     ]
+ * );
+ *
+ * echo $config->phalcon->controllersDir;
  * echo $config->phalcon->baseuri;
  * echo $config->models->metadata;
  *</code>
- *
  */
 class Yaml extends Config
 {

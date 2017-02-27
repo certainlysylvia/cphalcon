@@ -27,18 +27,22 @@
  * model which finally executes the operations when it fails
  *
  *<code>
- *$phql = "UPDATE Robots SET name = :name:, type = :type:, year = :year: WHERE id = :id:";
- *$status = $app->modelsManager->executeQuery($phql, array(
- *   'id' => 100,
- *   'name' => 'Astroy Boy',
- *   'type' => 'mechanical',
- *   'year' => 1959
- *));
+ * $phql = "UPDATE Robots SET name = :name:, type = :type:, year = :year: WHERE id = :id:";
  *
- *\//Check if the update was successful
- *if ($status->success() == true) {
- *   echo 'OK';
- *}
+ * $status = $app->modelsManager->executeQuery(
+ *     $phql,
+ *     [
+ *         "id"   => 100,
+ *         "name" => "Astroy Boy",
+ *         "type" => "mechanical",
+ *         "year" => 1959,
+ *     ]
+ * );
+ *
+ * // Check if the update was successful
+ * if ($status->success() === true) {
+ *     echo "OK";
+ * }
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Mvc_Model_Query_Status) {
@@ -70,7 +74,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct) {
 	}
 
 
-	zephir_update_property_this(this_ptr, SL("_success"), success ? ZEPHIR_GLOBAL(global_true) : ZEPHIR_GLOBAL(global_false) TSRMLS_CC);
+	if (success) {
+		zephir_update_property_this(this_ptr, SL("_success"), ZEPHIR_GLOBAL(global_true) TSRMLS_CC);
+	} else {
+		zephir_update_property_this(this_ptr, SL("_success"), ZEPHIR_GLOBAL(global_false) TSRMLS_CC);
+	}
 	zephir_update_property_this(this_ptr, SL("_model"), model TSRMLS_CC);
 
 }
@@ -80,6 +88,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getModel) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_model");
 
@@ -90,8 +99,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getModel) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages) {
 
+	zval *model = NULL;
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *model;
 
 	ZEPHIR_MM_GROW();
 
@@ -112,6 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, success) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_success");
 

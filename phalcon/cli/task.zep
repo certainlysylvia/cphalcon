@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -31,26 +31,22 @@ use Phalcon\Di\Injectable;
  * The Task class should at least have a "mainAction" method
  *
  *<code>
+ * class HelloTask extends \Phalcon\Cli\Task
+ * {
+ *     // This action will be executed by default
+ *     public function mainAction()
+ *     {
  *
- *class HelloTask extends \Phalcon\Cli\Task
- *{
+ *     }
  *
- *  //This action will be executed by default
- *  public function mainAction()
- *  {
+ *     public function findAction()
+ *     {
  *
- *  }
- *
- *  public function findAction()
- *  {
- *
- *  }
- *
- *}
- *
+ *     }
+ * }
  *</code>
  */
-class Task extends Injectable
+class Task extends Injectable implements TaskInterface
 {
 
 	/**
@@ -58,6 +54,8 @@ class Task extends Injectable
 	 */
 	public final function __construct()
 	{
-
+		if method_exists(this, "onConstruct") {
+			this->{"onConstruct"}();
+		}
 	}
 }

@@ -30,11 +30,15 @@
  * Encapsulates the resultset internals
  *
  * <code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	$result->setFetchMode(Phalcon\Db::FETCH_NUM);
- *	while ($robot = $result->fetchArray()) {
- *		print_r($robot);
- *	}
+ * $result = $connection->query("SELECT * FROM robots ORDER BY name");
+ *
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_NUM
+ * );
+ *
+ * while ($robot = $result->fetchArray()) {
+ *     print_r($robot);
+ * }
  * </code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Db_Result_Pdo) {
@@ -116,8 +120,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, __construct) {
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, execute) {
 
-	int ZEPHIR_LAST_CALL_STATUS;
 	zval *_0;
+	int ZEPHIR_LAST_CALL_STATUS;
 
 	ZEPHIR_MM_GROW();
 
@@ -133,11 +137,15 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, execute) {
  * This method is affected by the active fetch flag set using Phalcon\Db\Result\Pdo::setFetchMode
  *
  *<code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	$result->setFetchMode(Phalcon\Db::FETCH_OBJ);
- *	while ($robot = $result->fetch()) {
- *		echo $robot->name;
- *	}
+ * $result = $connection->query("SELECT * FROM robots ORDER BY name");
+ *
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_OBJ
+ * );
+ *
+ * while ($robot = $result->fetch()) {
+ *     echo $robot->name;
+ * }
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, fetch) {
@@ -171,17 +179,21 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetch) {
  * This method is affected by the active fetch flag set using Phalcon\Db\Result\Pdo::setFetchMode
  *
  *<code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	$result->setFetchMode(Phalcon\Db::FETCH_NUM);
- *	while ($robot = result->fetchArray()) {
- *		print_r($robot);
- *	}
+ * $result = $connection->query("SELECT * FROM robots ORDER BY name");
+ *
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_NUM
+ * );
+ *
+ * while ($robot = result->fetchArray()) {
+ *     print_r($robot);
+ * }
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, fetchArray) {
 
-	int ZEPHIR_LAST_CALL_STATUS;
 	zval *_0;
+	int ZEPHIR_LAST_CALL_STATUS;
 
 	ZEPHIR_MM_GROW();
 
@@ -197,14 +209,17 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchArray) {
  * This method is affected by the active fetch flag set using Phalcon\Db\Result\Pdo::setFetchMode
  *
  *<code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	$robots = $result->fetchAll();
+ * $result = $connection->query(
+ *     "SELECT * FROM robots ORDER BY name"
+ * );
+ *
+ * $robots = $result->fetchAll();
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll) {
 
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *fetchStyle = NULL, *fetchArgument = NULL, *ctorArgs = NULL, *_0, *_1;
+	zval *fetchStyle = NULL, *fetchArgument = NULL, *ctorArgs = NULL, *pdoStatement = NULL;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 0, 3, &fetchStyle, &fetchArgument, &ctorArgs);
@@ -220,32 +235,29 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll) {
 	}
 
 
+	ZEPHIR_OBS_VAR(pdoStatement);
+	zephir_read_property_this(&pdoStatement, this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
 	if (Z_TYPE_P(fetchStyle) == IS_LONG) {
-		if ((((int) (zephir_get_numberval(fetchStyle)) & 8)) == 8) {
-			_0 = zephir_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-			ZEPHIR_RETURN_CALL_METHOD(_0, "fetchall", NULL, 0, fetchStyle, fetchArgument, ctorArgs);
+		if (ZEPHIR_IS_LONG(fetchStyle, 8)) {
+			ZEPHIR_RETURN_CALL_METHOD(pdoStatement, "fetchall", NULL, 0, fetchStyle, fetchArgument, ctorArgs);
 			zephir_check_call_status();
 			RETURN_MM();
 		}
-		if ((((int) (zephir_get_numberval(fetchStyle)) & 7)) == 7) {
-			_0 = zephir_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-			ZEPHIR_RETURN_CALL_METHOD(_0, "fetchall", NULL, 0, fetchStyle, fetchArgument);
+		if (ZEPHIR_IS_LONG(fetchStyle, 7)) {
+			ZEPHIR_RETURN_CALL_METHOD(pdoStatement, "fetchall", NULL, 0, fetchStyle, fetchArgument);
 			zephir_check_call_status();
 			RETURN_MM();
 		}
-		if ((((int) (zephir_get_numberval(fetchStyle)) & 10)) == 10) {
-			_0 = zephir_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-			ZEPHIR_RETURN_CALL_METHOD(_0, "fetchall", NULL, 0, fetchStyle, fetchArgument);
+		if (ZEPHIR_IS_LONG(fetchStyle, 10)) {
+			ZEPHIR_RETURN_CALL_METHOD(pdoStatement, "fetchall", NULL, 0, fetchStyle, fetchArgument);
 			zephir_check_call_status();
 			RETURN_MM();
 		}
-		_0 = zephir_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-		ZEPHIR_RETURN_CALL_METHOD(_0, "fetchall", NULL, 0, fetchStyle);
+		ZEPHIR_RETURN_CALL_METHOD(pdoStatement, "fetchall", NULL, 0, fetchStyle);
 		zephir_check_call_status();
 		RETURN_MM();
 	}
-	_1 = zephir_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-	ZEPHIR_RETURN_CALL_METHOD(_1, "fetchall", NULL, 0);
+	ZEPHIR_RETURN_CALL_METHOD(pdoStatement, "fetchall", NULL, 0);
 	zephir_check_call_status();
 	RETURN_MM();
 
@@ -255,15 +267,18 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll) {
  * Gets number of rows returned by a resultset
  *
  *<code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	echo 'There are ', $result->numRows(), ' rows in the resultset';
+ * $result = $connection->query(
+ *     "SELECT * FROM robots ORDER BY name"
+ * );
+ *
+ * echo "There are ", $result->numRows(), " rows in the resultset";
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, numRows) {
 
-	zend_bool _0;
+	zend_bool _0$$3;
+	zval *sqlStatement = NULL, *rowCount = NULL, *connection = NULL, *type = NULL, *pdoStatement = NULL, *matches = NULL, *result = NULL, *row = NULL, *_1$$6, _2$$6, *_3$$7, *_4$$7, *_5$$7, *_6$$7;
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *sqlStatement, *rowCount = NULL, *connection, *type = NULL, *pdoStatement, *matches, *result = NULL, *row = NULL, *_1, _2, *_3, *_4, *_5, *_6;
 
 	ZEPHIR_MM_GROW();
 
@@ -274,11 +289,11 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows) {
 		zephir_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY_CC);
 		ZEPHIR_CALL_METHOD(&type, connection, "gettype", NULL, 0);
 		zephir_check_call_status();
-		_0 = ZEPHIR_IS_STRING(type, "mysql");
-		if (!(_0)) {
-			_0 = ZEPHIR_IS_STRING(type, "pgsql");
+		_0$$3 = ZEPHIR_IS_STRING(type, "mysql");
+		if (!(_0$$3)) {
+			_0$$3 = ZEPHIR_IS_STRING(type, "pgsql");
 		}
-		if (_0) {
+		if (_0$$3) {
 			ZEPHIR_OBS_VAR(pdoStatement);
 			zephir_read_property_this(&pdoStatement, this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
 			ZEPHIR_CALL_METHOD(&rowCount, pdoStatement, "rowcount", NULL, 0);
@@ -290,22 +305,22 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows) {
 			if (!(zephir_start_with_str(sqlStatement, SL("SELECT COUNT(*) ")))) {
 				ZEPHIR_INIT_VAR(matches);
 				ZVAL_NULL(matches);
-				ZEPHIR_INIT_VAR(_1);
-				ZEPHIR_SINIT_VAR(_2);
-				ZVAL_STRING(&_2, "/^SELECT\\s+(.*)/i", 0);
-				zephir_preg_match(_1, &_2, sqlStatement, matches, 0, 0 , 0  TSRMLS_CC);
-				if (zephir_is_true(_1)) {
-					zephir_array_fetch_long(&_3, matches, 1, PH_NOISY | PH_READONLY, "phalcon/db/result/pdo.zep", 213 TSRMLS_CC);
-					ZEPHIR_INIT_VAR(_4);
-					ZEPHIR_CONCAT_SVS(_4, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", _3, ")");
-					_5 = zephir_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY_CC);
-					_6 = zephir_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY_CC);
-					ZEPHIR_CALL_METHOD(&result, connection, "query", NULL, 0, _4, _5, _6);
+				ZEPHIR_INIT_VAR(_1$$6);
+				ZEPHIR_SINIT_VAR(_2$$6);
+				ZVAL_STRING(&_2$$6, "/^SELECT\\s+(.*)/i", 0);
+				zephir_preg_match(_1$$6, &_2$$6, sqlStatement, matches, 0, 0 , 0  TSRMLS_CC);
+				if (zephir_is_true(_1$$6)) {
+					zephir_array_fetch_long(&_3$$7, matches, 1, PH_NOISY | PH_READONLY, "phalcon/db/result/pdo.zep", 238 TSRMLS_CC);
+					ZEPHIR_INIT_VAR(_4$$7);
+					ZEPHIR_CONCAT_SVS(_4$$7, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", _3$$7, ")");
+					_5$$7 = zephir_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY_CC);
+					_6$$7 = zephir_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY_CC);
+					ZEPHIR_CALL_METHOD(&result, connection, "query", NULL, 0, _4$$7, _5$$7, _6$$7);
 					zephir_check_call_status();
 					ZEPHIR_CALL_METHOD(&row, result, "fetch", NULL, 0);
 					zephir_check_call_status();
 					ZEPHIR_OBS_NVAR(rowCount);
-					zephir_array_fetch_string(&rowCount, row, SL("numrows"), PH_NOISY, "phalcon/db/result/pdo.zep", 215 TSRMLS_CC);
+					zephir_array_fetch_string(&rowCount, row, SL("numrows"), PH_NOISY, "phalcon/db/result/pdo.zep", 244 TSRMLS_CC);
 				}
 			} else {
 				ZEPHIR_INIT_NVAR(rowCount);
@@ -322,16 +337,23 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows) {
  * Moves internal resultset cursor to another position letting us to fetch a certain row
  *
  *<code>
- *	$result = $connection->query("SELECT * FROM robots ORDER BY name");
- *	$result->dataSeek(2); // Move to third row on result
- *	$row = $result->fetch(); // Fetch third row
+ * $result = $connection->query(
+ *     "SELECT * FROM robots ORDER BY name"
+ * );
+ *
+ * // Move to third row on result
+ * $result->dataSeek(2);
+ *
+ * // Fetch third row
+ * $row = $result->fetch();
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek) {
 
+	zephir_fcall_cache_entry *_2 = NULL;
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *number_param = NULL, *connection, *pdo = NULL, *sqlStatement, *bindParams, *statement = NULL, *_0 = NULL, *_1;
-	long number;
+	zval *number_param = NULL, *connection = NULL, *pdo = NULL, *sqlStatement = NULL, *bindParams = NULL, *statement = NULL, *_0$$4 = NULL, *_1$$4;
+	long number, n = 0;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 1, 0, &number_param);
@@ -339,7 +361,6 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek) {
 	number = zephir_get_intval(number_param);
 
 
-	 { pdo_stmt_t *stmt; long n; 
 	ZEPHIR_OBS_VAR(connection);
 	zephir_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY_CC);
 	ZEPHIR_CALL_METHOD(&pdo, connection, "getinternalhandler", NULL, 0);
@@ -352,43 +373,26 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek) {
 		ZEPHIR_CALL_METHOD(&statement, pdo, "prepare", NULL, 0, sqlStatement);
 		zephir_check_call_status();
 		if (Z_TYPE_P(statement) == IS_OBJECT) {
-			_1 = zephir_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY_CC);
-			ZEPHIR_CALL_METHOD(&_0, connection, "executeprepared", NULL, 0, statement, bindParams, _1);
+			_1$$4 = zephir_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY_CC);
+			ZEPHIR_CALL_METHOD(&_0$$4, connection, "executeprepared", NULL, 0, statement, bindParams, _1$$4);
 			zephir_check_call_status();
-			ZEPHIR_CPY_WRT(statement, _0);
+			ZEPHIR_CPY_WRT(statement, _0$$4);
 		}
 	} else {
 		ZEPHIR_CALL_METHOD(&statement, pdo, "query", NULL, 0, sqlStatement);
 		zephir_check_call_status();
 	}
 	zephir_update_property_this(this_ptr, SL("_pdoStatement"), statement TSRMLS_CC);
-	
-
-		/**
-		 * This a fetch scroll to reach the desired position, however with a big number of records
-		 * maybe it may be very slow
-		 */
-		stmt = (pdo_stmt_t*) zend_object_store_get_object(statement TSRMLS_CC);
-		if (!stmt->dbh) {
-			ZEPHIR_MM_RESTORE();
-			RETURN_FALSE;
+	n = -1;
+	number--;
+	while (1) {
+		if (!(n != number)) {
+			break;
 		}
-
-		n = -1;
-		number--;
-		while (n != number) {
-
-			if (!stmt->methods->fetcher(stmt, PDO_FETCH_ORI_NEXT, 0 TSRMLS_CC)) {
-				ZEPHIR_MM_RESTORE();
-				RETURN_NULL();
-			}
-
-			n++;
-		}
-
-		}
-
-		
+		ZEPHIR_CALL_METHOD(NULL, statement, "fetch", &_2, 0);
+		zephir_check_call_status();
+		n++;
+	}
 	ZEPHIR_MM_RESTORE();
 
 }
@@ -397,22 +401,30 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek) {
  * Changes the fetching mode affecting Phalcon\Db\Result\Pdo::fetch()
  *
  *<code>
- *	//Return array with integer indexes
- *	$result->setFetchMode(Phalcon\Db::FETCH_NUM);
+ * // Return array with integer indexes
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_NUM
+ * );
  *
- *	//Return associative array without integer indexes
- *	$result->setFetchMode(Phalcon\Db::FETCH_ASSOC);
+ * // Return associative array without integer indexes
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_ASSOC
+ * );
  *
- *	//Return associative array together with integer indexes
- *	$result->setFetchMode(Phalcon\Db::FETCH_BOTH);
+ * // Return associative array together with integer indexes
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_BOTH
+ * );
  *
- *	//Return an object
- *	$result->setFetchMode(Phalcon\Db::FETCH_OBJ);
+ * // Return an object
+ * $result->setFetchMode(
+ *     \Phalcon\Db::FETCH_OBJ
+ * );
  *</code>
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode) {
 
-	zval *fetchMode_param = NULL, *colNoOrClassNameOrObject = NULL, *ctorargs = NULL, *pdoStatement, *_0 = NULL, *_1 = NULL, *_2;
+	zval *fetchMode_param = NULL, *colNoOrClassNameOrObject = NULL, *ctorargs = NULL, *pdoStatement = NULL, *_9 = NULL, *_10, *_0$$3 = NULL, *_1$$3, *_2$$4, *_3$$5 = NULL, *_4$$5, *_5$$6, *_6$$7 = NULL, *_7$$7, *_8$$8, *_11$$9;
 	int fetchMode, ZEPHIR_LAST_CALL_STATUS;
 
 	ZEPHIR_MM_GROW();
@@ -429,53 +441,53 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode) {
 
 	ZEPHIR_OBS_VAR(pdoStatement);
 	zephir_read_property_this(&pdoStatement, this_ptr, SL("_pdoStatement"), PH_NOISY_CC);
-	if (((fetchMode & 7)) == 7) {
-		ZEPHIR_INIT_VAR(_1);
-		ZVAL_LONG(_1, fetchMode);
-		ZEPHIR_CALL_METHOD(&_0, pdoStatement, "setfetchmode", NULL, 0, _1, colNoOrClassNameOrObject);
+	if (fetchMode == 8) {
+		ZEPHIR_INIT_VAR(_1$$3);
+		ZVAL_LONG(_1$$3, fetchMode);
+		ZEPHIR_CALL_METHOD(&_0$$3, pdoStatement, "setfetchmode", NULL, 0, _1$$3, colNoOrClassNameOrObject, ctorargs);
 		zephir_check_call_status();
-		if (zephir_is_true(_0)) {
-			ZEPHIR_INIT_ZVAL_NREF(_2);
-			ZVAL_LONG(_2, fetchMode);
-			zephir_update_property_this(this_ptr, SL("_fetchMode"), _2 TSRMLS_CC);
+		if (zephir_is_true(_0$$3)) {
+			ZEPHIR_INIT_ZVAL_NREF(_2$$4);
+			ZVAL_LONG(_2$$4, fetchMode);
+			zephir_update_property_this(this_ptr, SL("_fetchMode"), _2$$4 TSRMLS_CC);
 			RETURN_MM_BOOL(1);
 		}
 		RETURN_MM_BOOL(0);
 	}
-	if (((fetchMode & 8)) == 8) {
-		ZEPHIR_INIT_NVAR(_1);
-		ZVAL_LONG(_1, fetchMode);
-		ZEPHIR_CALL_METHOD(&_0, pdoStatement, "setfetchmode", NULL, 0, _1, colNoOrClassNameOrObject, ctorargs);
+	if (fetchMode == 9) {
+		ZEPHIR_INIT_VAR(_4$$5);
+		ZVAL_LONG(_4$$5, fetchMode);
+		ZEPHIR_CALL_METHOD(&_3$$5, pdoStatement, "setfetchmode", NULL, 0, _4$$5, colNoOrClassNameOrObject);
 		zephir_check_call_status();
-		if (zephir_is_true(_0)) {
-			ZEPHIR_INIT_ZVAL_NREF(_2);
-			ZVAL_LONG(_2, fetchMode);
-			zephir_update_property_this(this_ptr, SL("_fetchMode"), _2 TSRMLS_CC);
+		if (zephir_is_true(_3$$5)) {
+			ZEPHIR_INIT_ZVAL_NREF(_5$$6);
+			ZVAL_LONG(_5$$6, fetchMode);
+			zephir_update_property_this(this_ptr, SL("_fetchMode"), _5$$6 TSRMLS_CC);
 			RETURN_MM_BOOL(1);
 		}
 		RETURN_MM_BOOL(0);
 	}
-	if (((fetchMode & 9)) == 9) {
-		ZEPHIR_INIT_NVAR(_1);
-		ZVAL_LONG(_1, fetchMode);
-		ZEPHIR_CALL_METHOD(&_0, pdoStatement, "setfetchmode", NULL, 0, _1, colNoOrClassNameOrObject);
+	if (fetchMode == 7) {
+		ZEPHIR_INIT_VAR(_7$$7);
+		ZVAL_LONG(_7$$7, fetchMode);
+		ZEPHIR_CALL_METHOD(&_6$$7, pdoStatement, "setfetchmode", NULL, 0, _7$$7, colNoOrClassNameOrObject);
 		zephir_check_call_status();
-		if (zephir_is_true(_0)) {
-			ZEPHIR_INIT_ZVAL_NREF(_2);
-			ZVAL_LONG(_2, fetchMode);
-			zephir_update_property_this(this_ptr, SL("_fetchMode"), _2 TSRMLS_CC);
+		if (zephir_is_true(_6$$7)) {
+			ZEPHIR_INIT_ZVAL_NREF(_8$$8);
+			ZVAL_LONG(_8$$8, fetchMode);
+			zephir_update_property_this(this_ptr, SL("_fetchMode"), _8$$8 TSRMLS_CC);
 			RETURN_MM_BOOL(1);
 		}
 		RETURN_MM_BOOL(0);
 	}
-	ZEPHIR_INIT_NVAR(_1);
-	ZVAL_LONG(_1, fetchMode);
-	ZEPHIR_CALL_METHOD(&_0, pdoStatement, "setfetchmode", NULL, 0, _1);
+	ZEPHIR_INIT_VAR(_10);
+	ZVAL_LONG(_10, fetchMode);
+	ZEPHIR_CALL_METHOD(&_9, pdoStatement, "setfetchmode", NULL, 0, _10);
 	zephir_check_call_status();
-	if (zephir_is_true(_0)) {
-		ZEPHIR_INIT_ZVAL_NREF(_2);
-		ZVAL_LONG(_2, fetchMode);
-		zephir_update_property_this(this_ptr, SL("_fetchMode"), _2 TSRMLS_CC);
+	if (zephir_is_true(_9)) {
+		ZEPHIR_INIT_ZVAL_NREF(_11$$9);
+		ZVAL_LONG(_11$$9, fetchMode);
+		zephir_update_property_this(this_ptr, SL("_fetchMode"), _11$$9 TSRMLS_CC);
 		RETURN_MM_BOOL(1);
 	}
 	RETURN_MM_BOOL(0);
@@ -487,6 +499,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode) {
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, getInternalResult) {
 
+	
 
 	RETURN_MEMBER(this_ptr, "_pdoStatement");
 

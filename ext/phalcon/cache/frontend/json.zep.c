@@ -32,22 +32,27 @@
  *<?php
  *
  * // Cache the data for 2 days
- * $frontCache = new \Phalcon\Cache\Frontend\Json(array(
- *    "lifetime" => 172800
- * ));
+ * $frontCache = new \Phalcon\Cache\Frontend\Json(
+ *     [
+ *         "lifetime" => 172800,
+ *     ]
+ * );
  *
- * //Create the Cache setting memcached connection options
- * $cache = new \Phalcon\Cache\Backend\Memcache($frontCache, array(
- *		'host' => 'localhost',
- *		'port' => 11211,
- *  	'persistent' => false
- * ));
+ * // Create the Cache setting memcached connection options
+ * $cache = new \Phalcon\Cache\Backend\Memcache(
+ *     $frontCache,
+ *     [
+ *         "host"       => "localhost",
+ *         "port"       => 11211,
+ *         "persistent" => false,
+ *     ]
+ * );
  *
- * //Cache arbitrary data
- * $cache->save('my-data', array(1, 2, 3, 4, 5));
+ * // Cache arbitrary data
+ * $cache->save("my-data", [1, 2, 3, 4, 5]);
  *
- * //Get data
- * $data = $cache->get('my-data');
+ * // Get data
+ * $data = $cache->get("my-data");
  *</code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Cache_Frontend_Json) {
@@ -86,7 +91,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, __construct) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, getLifetime) {
 
-	zval *options, *lifetime;
+	zval *options = NULL, *lifetime = NULL;
 
 
 	options = zephir_fetch_nproperty_this(this_ptr, SL("_frontendOptions"), PH_NOISY_CC);
@@ -104,6 +109,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, getLifetime) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, isBuffering) {
 
+	
 
 	RETURN_BOOL(0);
 
@@ -114,6 +120,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, isBuffering) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, start) {
 
+	
 
 
 }
@@ -125,6 +132,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, start) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, getContent) {
 
+	
 
 	RETURN_NULL();
 
@@ -135,15 +143,13 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, getContent) {
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, stop) {
 
+	
 
 
 }
 
 /**
  * Serializes data before storing them
- *
- * @param mixed data
- * @return string
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, beforeStore) {
 
@@ -160,9 +166,6 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, beforeStore) {
 
 /**
  * Unserializes data after retrieval
- *
- * @param mixed data
- * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Json, afterRetrieve) {
 

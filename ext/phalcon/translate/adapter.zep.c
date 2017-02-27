@@ -35,6 +35,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Translate_Adapter) {
 	 */
 	zend_declare_property_null(phalcon_translate_adapter_ce, SL("_interpolator"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
+	zend_class_implements(phalcon_translate_adapter_ce TSRMLS_CC, 1, phalcon_translate_adapterinterface_ce);
 	return SUCCESS;
 
 }
@@ -49,7 +50,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, __construct) {
 	zephir_fetch_params(1, 1, 0, &options_param);
 
 	options = options_param;
-
 
 
 	ZEPHIR_OBS_VAR(interpolator);
@@ -100,7 +100,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, t) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'translateKey' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(translateKey_param) == IS_STRING)) {
 		zephir_get_strval(translateKey, translateKey_param);
 	} else {
@@ -138,7 +137,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, _) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'translateKey' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(translateKey_param) == IS_STRING)) {
 		zephir_get_strval(translateKey, translateKey_param);
 	} else {
@@ -191,7 +189,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetExists) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'translateKey' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(translateKey_param) == IS_STRING)) {
 		zephir_get_strval(translateKey, translateKey_param);
 	} else {
@@ -243,7 +240,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetGet) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'translateKey' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(translateKey_param) == IS_STRING)) {
 		zephir_get_strval(translateKey, translateKey_param);
 	} else {
@@ -276,7 +272,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, replacePlaceholders) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'translation' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(translation_param) == IS_STRING)) {
 		zephir_get_strval(translation, translation_param);
 	} else {

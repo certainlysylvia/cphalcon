@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -30,7 +30,7 @@ use Phalcon\Logger\FormatterInterface;
  *
  * Base class for Phalcon\Logger adapters
  */
-abstract class Adapter
+abstract class Adapter implements AdapterInterface
 {
 
 	/**
@@ -45,7 +45,7 @@ abstract class Adapter
 	 *
 	 * @var array
 	 */
-	protected _queue;
+	protected _queue = [];
 
 	/**
 	 * Formatter
@@ -101,7 +101,7 @@ abstract class Adapter
  	 */
 	public function commit() -> <AdapterInterface>
 	{
-		var queue, message;
+		var message;
 
 		if !this->_transaction {
 			throw new Exception("There is no active transaction");
@@ -112,17 +112,17 @@ abstract class Adapter
 		/**
 		 * Check if the queue has something to log
 		 */
-		let queue = this->_queue;
-		if typeof queue == "array" {
-			for message in queue {
-				this->{"logInternal"}(
-					message->getMessage(),
-					message->getType(),
-					message->getTime(),
-					message->getContext()
-				);
-			}
+		for message in this->_queue {
+			this->{"logInternal"}(
+				message->getMessage(),
+				message->getType(),
+				message->getTime(),
+				message->getContext()
+			);
 		}
+
+		// clear logger queue at commit
+		let this->_queue = [];
 
 		return this;
 	}
@@ -146,12 +146,19 @@ abstract class Adapter
 	}
 
 	/**
+	 * Returns the whether the logger is currently in an active transaction or not
+	 */
+	public function isTransaction() -> boolean
+	{
+		return this->_transaction;
+	}
+
+	/**
  	 * Sends/Writes a critical message to the log
  	 */
 	public function critical(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::CRITICAL, message, context);
-		return this;
+		return this->log(Logger::CRITICAL, message, context);
 	}
 
 	/**
@@ -159,8 +166,7 @@ abstract class Adapter
  	 */
 	public function emergency(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::EMERGENCY, message, context);
-		return this;
+		return this->log(Logger::EMERGENCY, message, context);
 	}
 
 	/**
@@ -168,8 +174,7 @@ abstract class Adapter
  	 */
 	public function debug(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::DEBUG, message, context);
-		return this;
+		return this->log(Logger::DEBUG, message, context);
 	}
 
 	/**
@@ -177,8 +182,7 @@ abstract class Adapter
  	 */
 	public function error(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::ERROR, message, context);
-		return this;
+		return this->log(Logger::ERROR, message, context);
 	}
 
 	/**
@@ -186,8 +190,7 @@ abstract class Adapter
  	 */
 	public function info(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::INFO, message, context);
-		return this;
+		return this->log(Logger::INFO, message, context);
 	}
 
 	/**
@@ -195,8 +198,7 @@ abstract class Adapter
  	 */
 	public function notice(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::NOTICE, message, context);
-		return this;
+		return this->log(Logger::NOTICE, message, context);
 	}
 
 	/**
@@ -204,8 +206,7 @@ abstract class Adapter
  	 */
 	public function warning(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::WARNING, message, context);
-		return this;
+		return this->log(Logger::WARNING, message, context);
 	}
 
 	/**
@@ -213,8 +214,7 @@ abstract class Adapter
  	 */
 	public function alert(string! message, array! context = null) -> <AdapterInterface>
 	{
-		this->log(Logger::ALERT, message, context);
-		return this;
+		return this->log(Logger::ALERT, message, context);
 	}
 
 	/**

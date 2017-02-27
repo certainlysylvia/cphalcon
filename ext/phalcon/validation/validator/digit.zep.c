@@ -25,13 +25,33 @@
  *
  * Check for numeric character(s)
  *
- *<code>
- *use Phalcon\Validation\Validator\Digit as DigitValidator;
+ * <code>
+ * use Phalcon\Validation\Validator\Digit as DigitValidator;
  *
- *$validator->add('height', new DigitValidator(array(
- *   'message' => ':field must be numeric'
- *)));
- *</code>
+ * $validator->add(
+ *     "height",
+ *     new DigitValidator(
+ *         [
+ *             "message" => ":field must be numeric",
+ *         ]
+ *     )
+ * );
+ *
+ * $validator->add(
+ *     [
+ *         "height",
+ *         "width",
+ *     ],
+ *     new DigitValidator(
+ *         [
+ *             "message" => [
+ *                 "height" => "height must be numeric",
+ *                 "width"  => "width must be numeric",
+ *             ],
+ *         ]
+ *     )
+ * );
+ * </code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Validation_Validator_Digit) {
 
@@ -46,10 +66,10 @@ ZEPHIR_INIT_CLASS(Phalcon_Validation_Validator_Digit) {
  */
 PHP_METHOD(Phalcon_Validation_Validator_Digit, validate) {
 
-	zend_bool _2;
+	zend_bool _0;
 	int ZEPHIR_LAST_CALL_STATUS;
 	zval *field = NULL;
-	zval *validation, *field_param = NULL, *value = NULL, *message = NULL, *label = NULL, *replacePairs, *_0 = NULL, *_1 = NULL, *_3 = NULL, *_4 = NULL, *_5;
+	zval *validation, *field_param = NULL, *value = NULL, *message = NULL, *label = NULL, *replacePairs = NULL, *code = NULL, *_1 = NULL, *_2 = NULL, *_7 = NULL, *_8, *_3$$4, *_4$$6, *_5$$7, *_6$$8;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 2, 0, &validation, &field_param);
@@ -58,7 +78,6 @@ PHP_METHOD(Phalcon_Validation_Validator_Digit, validate) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'field' must be a string") TSRMLS_CC);
 		RETURN_MM_NULL();
 	}
-
 	if (likely(Z_TYPE_P(field_param) == IS_STRING)) {
 		zephir_get_strval(field, field_param);
 	} else {
@@ -69,59 +88,68 @@ PHP_METHOD(Phalcon_Validation_Validator_Digit, validate) {
 
 	ZEPHIR_CALL_METHOD(&value, validation, "getvalue", NULL, 0, field);
 	zephir_check_call_status();
-	ZEPHIR_INIT_VAR(_1);
-	ZVAL_STRING(_1, "allowEmpty", ZEPHIR_TEMP_PARAM_COPY);
-	ZEPHIR_CALL_METHOD(&_0, this_ptr, "issetoption", NULL, 0, _1);
-	zephir_check_temp_parameter(_1);
-	zephir_check_call_status();
-	_2 = zephir_is_true(_0);
-	if (_2) {
-		_2 = ZEPHIR_IS_EMPTY(value);
+	_0 = Z_TYPE_P(value) == IS_LONG;
+	if (!(_0)) {
+		ZEPHIR_CALL_FUNCTION(&_1, "ctype_digit", NULL, 473, value);
+		zephir_check_call_status();
+		_0 = zephir_is_true(_1);
 	}
-	if (_2) {
+	if (_0) {
 		RETURN_MM_BOOL(1);
 	}
-	ZEPHIR_CALL_FUNCTION(&_3, "ctype_digit", NULL, 439, value);
+	ZEPHIR_INIT_VAR(_2);
+	ZVAL_STRING(_2, "label", ZEPHIR_TEMP_PARAM_COPY);
+	ZEPHIR_CALL_METHOD(&label, this_ptr, "getoption", NULL, 0, _2);
+	zephir_check_temp_parameter(_2);
 	zephir_check_call_status();
-	if (!(zephir_is_true(_3))) {
-		ZEPHIR_INIT_NVAR(_1);
-		ZVAL_STRING(_1, "label", ZEPHIR_TEMP_PARAM_COPY);
-		ZEPHIR_CALL_METHOD(&label, this_ptr, "getoption", NULL, 0, _1);
-		zephir_check_temp_parameter(_1);
-		zephir_check_call_status();
-		if (ZEPHIR_IS_EMPTY(label)) {
-			ZEPHIR_CALL_METHOD(&label, validation, "getlabel", NULL, 0, field);
-			zephir_check_call_status();
-		}
-		ZEPHIR_INIT_NVAR(_1);
-		ZVAL_STRING(_1, "message", ZEPHIR_TEMP_PARAM_COPY);
-		ZEPHIR_CALL_METHOD(&message, this_ptr, "getoption", NULL, 0, _1);
-		zephir_check_temp_parameter(_1);
-		zephir_check_call_status();
-		ZEPHIR_INIT_VAR(replacePairs);
-		zephir_create_array(replacePairs, 1, 0 TSRMLS_CC);
-		zephir_array_update_string(&replacePairs, SL(":field"), &label, PH_COPY | PH_SEPARATE);
-		if (ZEPHIR_IS_EMPTY(message)) {
-			ZEPHIR_INIT_NVAR(_1);
-			ZVAL_STRING(_1, "Digit", ZEPHIR_TEMP_PARAM_COPY);
-			ZEPHIR_CALL_METHOD(&message, validation, "getdefaultmessage", NULL, 0, _1);
-			zephir_check_temp_parameter(_1);
-			zephir_check_call_status();
-		}
-		ZEPHIR_INIT_NVAR(_1);
-		object_init_ex(_1, phalcon_validation_message_ce);
-		ZEPHIR_CALL_FUNCTION(&_4, "strtr", NULL, 54, message, replacePairs);
-		zephir_check_call_status();
-		ZEPHIR_INIT_VAR(_5);
-		ZVAL_STRING(_5, "Digit", ZEPHIR_TEMP_PARAM_COPY);
-		ZEPHIR_CALL_METHOD(NULL, _1, "__construct", NULL, 435, _4, field, _5);
-		zephir_check_temp_parameter(_5);
-		zephir_check_call_status();
-		ZEPHIR_CALL_METHOD(NULL, validation, "appendmessage", NULL, 0, _1);
-		zephir_check_call_status();
-		RETURN_MM_BOOL(0);
+	if (Z_TYPE_P(label) == IS_ARRAY) {
+		zephir_array_fetch(&_3$$4, label, field, PH_NOISY | PH_READONLY, "phalcon/validation/validator/digit.zep", 77 TSRMLS_CC);
+		ZEPHIR_CPY_WRT(label, _3$$4);
 	}
-	RETURN_MM_BOOL(1);
+	if (ZEPHIR_IS_EMPTY(label)) {
+		ZEPHIR_CALL_METHOD(&label, validation, "getlabel", NULL, 0, field);
+		zephir_check_call_status();
+	}
+	ZEPHIR_INIT_NVAR(_2);
+	ZVAL_STRING(_2, "message", ZEPHIR_TEMP_PARAM_COPY);
+	ZEPHIR_CALL_METHOD(&message, this_ptr, "getoption", NULL, 0, _2);
+	zephir_check_temp_parameter(_2);
+	zephir_check_call_status();
+	if (Z_TYPE_P(message) == IS_ARRAY) {
+		zephir_array_fetch(&_4$$6, message, field, PH_NOISY | PH_READONLY, "phalcon/validation/validator/digit.zep", 85 TSRMLS_CC);
+		ZEPHIR_CPY_WRT(message, _4$$6);
+	}
+	ZEPHIR_INIT_VAR(replacePairs);
+	zephir_create_array(replacePairs, 1, 0 TSRMLS_CC);
+	zephir_array_update_string(&replacePairs, SL(":field"), &label, PH_COPY | PH_SEPARATE);
+	if (ZEPHIR_IS_EMPTY(message)) {
+		ZEPHIR_INIT_VAR(_5$$7);
+		ZVAL_STRING(_5$$7, "Digit", ZEPHIR_TEMP_PARAM_COPY);
+		ZEPHIR_CALL_METHOD(&message, validation, "getdefaultmessage", NULL, 0, _5$$7);
+		zephir_check_temp_parameter(_5$$7);
+		zephir_check_call_status();
+	}
+	ZEPHIR_INIT_NVAR(_2);
+	ZVAL_STRING(_2, "code", ZEPHIR_TEMP_PARAM_COPY);
+	ZEPHIR_CALL_METHOD(&code, this_ptr, "getoption", NULL, 0, _2);
+	zephir_check_temp_parameter(_2);
+	zephir_check_call_status();
+	if (Z_TYPE_P(code) == IS_ARRAY) {
+		zephir_array_fetch(&_6$$8, code, field, PH_NOISY | PH_READONLY, "phalcon/validation/validator/digit.zep", 94 TSRMLS_CC);
+		ZEPHIR_CPY_WRT(code, _6$$8);
+	}
+	ZEPHIR_INIT_NVAR(_2);
+	object_init_ex(_2, phalcon_validation_message_ce);
+	ZEPHIR_CALL_FUNCTION(&_7, "strtr", NULL, 26, message, replacePairs);
+	zephir_check_call_status();
+	ZEPHIR_INIT_VAR(_8);
+	ZVAL_STRING(_8, "Digit", ZEPHIR_TEMP_PARAM_COPY);
+	ZEPHIR_CALL_METHOD(NULL, _2, "__construct", NULL, 465, _7, field, _8, code);
+	zephir_check_temp_parameter(_8);
+	zephir_check_call_status();
+	ZEPHIR_CALL_METHOD(NULL, validation, "appendmessage", NULL, 0, _2);
+	zephir_check_call_status();
+	RETURN_MM_BOOL(0);
 
 }
 

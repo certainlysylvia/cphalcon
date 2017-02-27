@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,31 +21,31 @@ namespace Phalcon\Paginator\Adapter;
 
 use Phalcon\Paginator\Exception;
 use Phalcon\Paginator\Adapter;
-use Phalcon\Paginator\AdapterInterface;
 
 /**
  * Phalcon\Paginator\Adapter\NativeArray
  *
  * Pagination using a PHP array as source of data
  *
- *<code>
- *	$paginator = new \Phalcon\Paginator\Adapter\NativeArray(
- *		array(
- *			"data"  => array(
- *				array('id' => 1, 'name' => 'Artichoke'),
- *				array('id' => 2, 'name' => 'Carrots'),
- *				array('id' => 3, 'name' => 'Beet'),
- *				array('id' => 4, 'name' => 'Lettuce'),
- *				array('id' => 5, 'name' => '')
- *			),
- *			"limit" => 2,
- *			"page"  => $currentPage
- *		)
- *	);
- *</code>
+ * <code>
+ * use Phalcon\Paginator\Adapter\NativeArray;
  *
+ * $paginator = new NativeArray(
+ *     [
+ *         "data"  => [
+ *             ["id" => 1, "name" => "Artichoke"],
+ *             ["id" => 2, "name" => "Carrots"],
+ *             ["id" => 3, "name" => "Beet"],
+ *             ["id" => 4, "name" => "Lettuce"],
+ *             ["id" => 5, "name" => ""],
+ *         ],
+ *         "limit" => 2,
+ *         "page"  => $currentPage,
+ *     ]
+ * );
+ *</code>
  */
-class NativeArray extends Adapter implements AdapterInterface
+class NativeArray extends Adapter
 {
 
 	/**

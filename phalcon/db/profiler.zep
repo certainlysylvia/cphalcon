@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -26,33 +26,30 @@ use Phalcon\Db\Profiler\Item;
  *
  * Instances of Phalcon\Db can generate execution profiles
  * on SQL statements sent to the relational database. Profiled
- * information includes execution time in miliseconds.
+ * information includes execution time in milliseconds.
  * This helps you to identify bottlenecks in your applications.
  *
  *<code>
+ * $profiler = new \Phalcon\Db\Profiler();
  *
- *	$profiler = new \Phalcon\Db\Profiler();
+ * // Set the connection profiler
+ * $connection->setProfiler($profiler);
  *
- *	//Set the connection profiler
- *	$connection->setProfiler($profiler);
+ * $sql = "SELECT buyer_name, quantity, product_name
+ * FROM buyers LEFT JOIN products ON
+ * buyers.pid=products.id";
  *
- *	$sql = "SELECT buyer_name, quantity, product_name
- *	FROM buyers LEFT JOIN products ON
- *	buyers.pid=products.id";
+ * // Execute a SQL statement
+ * $connection->query($sql);
  *
- *	//Execute a SQL statement
- *	$connection->query($sql);
+ * // Get the last profile in the profiler
+ * $profile = $profiler->getLastProfile();
  *
- *	//Get the last profile in the profiler
- *	$profile = $profiler->getLastProfile();
- *
- *	echo "SQL Statement: ", $profile->getSQLStatement(), "\n";
- *	echo "Start Time: ", $profile->getInitialTime(), "\n";
- *	echo "Final Time: ", $profile->getFinalTime(), "\n";
- *	echo "Total Elapsed Time: ", $profile->getTotalElapsedSeconds(), "\n";
- *
+ * echo "SQL Statement: ", $profile->getSQLStatement(), "\n";
+ * echo "Start Time: ", $profile->getInitialTime(), "\n";
+ * echo "Final Time: ", $profile->getFinalTime(), "\n";
+ * echo "Total Elapsed Time: ", $profile->getTotalElapsedSeconds(), "\n";
  *</code>
- *
  */
 class Profiler
 {

@@ -29,6 +29,7 @@ ZEPHIR_INIT_CLASS(Phalcon_Logger_Formatter) {
 
 	ZEPHIR_REGISTER_CLASS(Phalcon\\Logger, Formatter, phalcon, logger_formatter, phalcon_logger_formatter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
+	zend_class_implements(phalcon_logger_formatter_ce TSRMLS_CC, 1, phalcon_logger_formatterinterface_ce);
 	return SUCCESS;
 
 }
@@ -92,11 +93,11 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString) {
  */
 PHP_METHOD(Phalcon_Logger_Formatter, interpolate) {
 
-	int ZEPHIR_LAST_CALL_STATUS;
-	HashTable *_2;
-	HashPosition _1;
+	HashTable *_2$$3;
+	HashPosition _1$$3;
 	zend_bool _0;
-	zval *message_param = NULL, *context = NULL, *replace, *key = NULL, *value = NULL, **_3, *_4 = NULL;
+	int ZEPHIR_LAST_CALL_STATUS;
+	zval *message_param = NULL, *context = NULL, *replace = NULL, *key = NULL, *value = NULL, **_3$$3, *_4$$4 = NULL;
 	zval *message = NULL;
 
 	ZEPHIR_MM_GROW();
@@ -115,18 +116,18 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate) {
 	if (_0) {
 		ZEPHIR_INIT_VAR(replace);
 		array_init(replace);
-		zephir_is_iterable(context, &_2, &_1, 0, 0, "phalcon/logger/formatter.zep", 89);
+		zephir_is_iterable(context, &_2$$3, &_1$$3, 0, 0, "phalcon/logger/formatter.zep", 89);
 		for (
-		  ; zephir_hash_get_current_data_ex(_2, (void**) &_3, &_1) == SUCCESS
-		  ; zephir_hash_move_forward_ex(_2, &_1)
+		  ; zephir_hash_get_current_data_ex(_2$$3, (void**) &_3$$3, &_1$$3) == SUCCESS
+		  ; zephir_hash_move_forward_ex(_2$$3, &_1$$3)
 		) {
-			ZEPHIR_GET_HMKEY(key, _2, _1);
-			ZEPHIR_GET_HVALUE(value, _3);
-			ZEPHIR_INIT_LNVAR(_4);
-			ZEPHIR_CONCAT_SVS(_4, "{", key, "}");
-			zephir_array_update_zval(&replace, _4, &value, PH_COPY | PH_SEPARATE);
+			ZEPHIR_GET_HMKEY(key, _2$$3, _1$$3);
+			ZEPHIR_GET_HVALUE(value, _3$$3);
+			ZEPHIR_INIT_LNVAR(_4$$4);
+			ZEPHIR_CONCAT_SVS(_4$$4, "{", key, "}");
+			zephir_array_update_zval(&replace, _4$$4, &value, PH_COPY | PH_SEPARATE);
 		}
-		ZEPHIR_RETURN_CALL_FUNCTION("strtr", NULL, 54, message, replace);
+		ZEPHIR_RETURN_CALL_FUNCTION("strtr", NULL, 26, message, replace);
 		zephir_check_call_status();
 		RETURN_MM();
 	}

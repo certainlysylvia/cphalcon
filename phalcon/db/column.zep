@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -28,19 +28,22 @@ use Phalcon\Db\ColumnInterface;
  * Allows to define columns to be used on create or alter table operations
  *
  *<code>
- *	use Phalcon\Db\Column as Column;
+ * use Phalcon\Db\Column as Column;
  *
- * //column definition
- * $column = new Column("id", array(
- *   "type" => Column::TYPE_INTEGER,
- *   "size" => 10,
- *   "unsigned" => true,
- *   "notNull" => true,
- *   "autoIncrement" => true,
- *   "first" => true
- * ));
+ * // Column definition
+ * $column = new Column(
+ *     "id",
+ *     [
+ *         "type"          => Column::TYPE_INTEGER,
+ *         "size"          => 10,
+ *         "unsigned"      => true,
+ *         "notNull"       => true,
+ *         "autoIncrement" => true,
+ *         "first"         => true,
+ *     ]
+ * );
  *
- * //add column to existing table
+ * // Add column to existing table
  * $connection->addColumn("robots", null, $column);
  *</code>
  */
@@ -134,6 +137,11 @@ class Column implements ColumnInterface
 	const TYPE_JSONB = 16;
 
 	/**
+	 * Datetime abstract type
+	 */
+	const TYPE_TIMESTAMP = 17;
+
+	/**
 	 * Bind Type Null
 	 */
 	const BIND_PARAM_NULL = 0;
@@ -194,7 +202,7 @@ class Column implements ColumnInterface
 	 *
 	 * @var int
 	 */
-	protected _typeReference { get };
+	protected _typeReference = -1 { get };
 
 	/**
 	 * Column data type values
@@ -294,8 +302,6 @@ class Column implements ColumnInterface
 
 		if fetch typeReference, definition["typeReference"] {
 			let this->_typeReference = typeReference;
-		} else {
-			let this->_typeReference = -1;
 		}
 
 		if fetch typeValues, definition["typeValues"] {
@@ -556,5 +562,17 @@ class Column implements ColumnInterface
 		}
 
 		return new self(columnName, definition);
+	}
+
+	/**
+	 * Check whether column has default value
+	 */
+	public function hasDefault() -> boolean
+	{
+		if this->isAutoIncrement() {
+			return false;
+		}
+
+		return this->_default !== null;
 	}
 }

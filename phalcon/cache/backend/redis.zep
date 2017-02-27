@@ -3,7 +3,7 @@
  +------------------------------------------------------------------------+
  | Phalcon Framework                                                      |
  +------------------------------------------------------------------------+
- | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+ | Copyright (c) 2011-2017 Phalcon Team (https://phalconphp.com)          |
  +------------------------------------------------------------------------+
  | This source file is subject to the New BSD License that is bundled     |
  | with this package in the file docs/LICENSE.txt.                        |
@@ -21,7 +21,6 @@ namespace Phalcon\Cache\Backend;
 
 use Phalcon\Cache\Backend;
 use Phalcon\Cache\Exception;
-use Phalcon\Cache\BackendInterface;
 use Phalcon\Cache\FrontendInterface;
 
 /**
@@ -32,31 +31,37 @@ use Phalcon\Cache\FrontendInterface;
  * This adapter uses the special redis key "_PHCR" to store all the keys internally used by the adapter
  *
  *<code>
+ * use Phalcon\Cache\Backend\Redis;
+ * use Phalcon\Cache\Frontend\Data as FrontData;
  *
  * // Cache data for 2 days
- * $frontCache = new \Phalcon\Cache\Frontend\Data(array(
- *    "lifetime" => 172800
- * ));
+ * $frontCache = new FrontData(
+ *     [
+ *         "lifetime" => 172800,
+ *     ]
+ * );
  *
- * //Create the Cache setting redis connection options
- * $cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
- *		'host' => 'localhost',
- *		'port' => 6379,
- *		'auth' => 'foobared',
- *  	'persistent' => false
- * ));
+ * // Create the Cache setting redis connection options
+ * $cache = new Redis(
+ *     $frontCache,
+ *     [
+ *         "host"       => "localhost",
+ *         "port"       => 6379,
+ *         "auth"       => "foobared",
+ *         "persistent" => false,
+ *         "index"      => 0,
+ *     ]
+ * );
  *
- * //Cache arbitrary data
- * $cache->save('my-data', array(1, 2, 3, 4, 5));
+ * // Cache arbitrary data
+ * $cache->save("my-data", [1, 2, 3, 4, 5]);
  *
- * //Get data
- * $data = $cache->get('my-data');
- *
+ * // Get data
+ * $data = $cache->get("my-data");
  *</code>
  */
-class Redis extends Backend implements BackendInterface
+class Redis extends Backend
 {
-
 	protected _redis = null;
 
 	/**
@@ -87,8 +92,9 @@ class Redis extends Backend implements BackendInterface
 			let options["persistent"] = false;
 		}
 
-		if !isset options["statsKey"] || empty options["statsKey"] {
-			let options["statsKey"] = "_PHCR";
+		if !isset options["statsKey"] {
+			// Disable tracking of cached keys per default
+			let options["statsKey"] = "";
 		}
 
 		parent::__construct(frontend, options);
@@ -126,11 +132,11 @@ class Redis extends Backend implements BackendInterface
 			}
 		}
 
-		if fetch index, options["index"] {
+		if fetch index, options["index"] && index > 0 {
 			let success = redis->select(index);
 
 			if !success {
-				throw new Exception("Redisd server selected database failed");
+				throw new Exception("Redis server selected database failed");
 			}
 		}
 
@@ -139,12 +145,8 @@ class Redis extends Backend implements BackendInterface
 
 	/**
 	 * Returns a cached content
-	 *
-	 * @param int|string keyName
-	 * @param   long lifetime
-	 * @return  mixed
 	 */
-	public function get(keyName, lifetime = null)
+	public function get(string keyName, int lifetime = null) -> var | null
 	{
 		var redis, frontend, prefix, lastKey, cachedContent;
 
@@ -160,7 +162,7 @@ class Redis extends Backend implements BackendInterface
 		let this->_lastKey = lastKey;
 		let cachedContent = redis->get(lastKey);
 
-		if !cachedContent {
+		if cachedContent === false {
 			return null;
 		}
 
@@ -174,23 +176,30 @@ class Redis extends Backend implements BackendInterface
 	/**
 	 * Stores cached content into the file backend and stops the frontend
 	 *
+	 * <code>
+	 * $cache->save("my-key", $data);
+	 *
+	 * // Save data termlessly
+	 * $cache->save("my-key", $data, -1);
+	 * </code>
+	 *
 	 * @param int|string keyName
 	 * @param string content
-	 * @param long lifetime
+	 * @param int lifetime
 	 * @param boolean stopBuffer
 	 */
-	public function save(keyName = null, content = null, lifetime = null, boolean stopBuffer = true)
+	public function save(keyName = null, content = null, lifetime = null, boolean stopBuffer = true) -> boolean
 	{
-		var prefixedKey, lastKey, prefix, frontend, redis, cachedContent, preparedContent,
+		var prefixedKey, lastKey, frontend, redis, cachedContent, preparedContent,
 			tmp, tt1, success, options, specialKey, isBuffering;
 
-		if !keyName {
+		if keyName === null {
 			let lastKey = this->_lastKey;
 			let prefixedKey = substr(lastKey, 5);
 		} else {
-			let prefix = this->_prefix;
-			let prefixedKey = prefix . keyName;
-			let lastKey = "_PHCR" . prefixedKey;
+			let prefixedKey = this->_prefix . keyName,
+				lastKey = "_PHCR" . prefixedKey,
+				this->_lastKey = lastKey;
 		}
 
 		if !lastKey {
@@ -208,7 +217,7 @@ class Redis extends Backend implements BackendInterface
 			let redis = this->_redis;
 		}
 
-		if !content {
+		if content === null {
 			let cachedContent = frontend->getContent();
 		} else {
 			let cachedContent = content;
@@ -219,9 +228,11 @@ class Redis extends Backend implements BackendInterface
 		 */
 		if !is_numeric(cachedContent) {
 			let preparedContent = frontend->beforeStore(cachedContent);
+		} else {
+			let preparedContent = cachedContent;
 		}
 
-		if !lifetime {
+		if lifetime === null {
 			let tmp = this->_lastLifetime;
 
 			if !tmp {
@@ -233,27 +244,26 @@ class Redis extends Backend implements BackendInterface
 			let tt1 = lifetime;
 		}
 
-		if is_numeric(cachedContent) {
-			let success = redis->set(lastKey, cachedContent);
-		} else {
-			let success = redis->set(lastKey, preparedContent);
-		}
+		let success = redis->set(lastKey, preparedContent);
 
 		if !success {
 			throw new Exception("Failed storing the data in redis");
 		}
 
-		redis->settimeout(lastKey, tt1);
+		// Don't set expiration for negative ttl or zero
+		if tt1 >= 1 {
+			redis->settimeout(lastKey, tt1);
+		}
 
 		let options = this->_options;
 
-		if !isset options["statsKey"] {
+		if !fetch specialKey, options["statsKey"] {
 			throw new Exception("Unexpected inconsistency in options");
 		}
 
-		let specialKey = options["statsKey"];
-
-		redis->sAdd(specialKey, prefixedKey);
+		if specialKey != "" {
+			redis->sAdd(specialKey, prefixedKey);
+		}
 
 		let isBuffering = frontend->isBuffering();
 
@@ -266,15 +276,16 @@ class Redis extends Backend implements BackendInterface
 		}
 
 		let this->_started = false;
+
+		return success;
 	}
 
 	/**
 	 * Deletes a value from the cache by its key
 	 *
 	 * @param int|string keyName
-	 * @return boolean
 	 */
-	public function delete(keyName)
+	public function delete(keyName) -> boolean
 	{
 		var redis, prefix, prefixedKey, lastKey, options, specialKey;
 
@@ -289,29 +300,33 @@ class Redis extends Backend implements BackendInterface
 		let lastKey = "_PHCR" . prefixedKey;
 		let options = this->_options;
 
-		if !isset options["statsKey"] {
+		if !fetch specialKey, options["statsKey"] {
 			throw new Exception("Unexpected inconsistency in options");
 		}
 
-		let specialKey = options["statsKey"];
-
-		redis->sRem(specialKey, prefixedKey);
+		if specialKey != "" {
+			redis->sRem(specialKey, prefixedKey);
+		}
 
 		/**
 		* Delete the key from redis
 		*/
-		return redis->delete(lastKey);
+		return (bool) redis->delete(lastKey);
 	}
 
 	/**
-	 * Query the existing cached keys
+	 * Query the existing cached keys.
 	 *
-	 * @param string prefix
-	 * @return array
+	 * <code>
+	 * $cache->save("users-ids", [1, 2, 3]);
+	 * $cache->save("projects-ids", [4, 5, 6]);
+	 *
+	 * var_dump($cache->queryKeys("users")); // ["users-ids"]
+	 * </code>
 	 */
-	public function queryKeys(prefix = null)
+	public function queryKeys(string prefix = null) -> array
 	{
-		var redis, options, keys, specialKey, key, value;
+		var redis, options, keys, specialKey, key, idx;
 
 		let redis = this->_redis;
 
@@ -322,21 +337,25 @@ class Redis extends Backend implements BackendInterface
 
 		let options = this->_options;
 
-		if !isset options["statsKey"] {
+		if !fetch specialKey, options["statsKey"] {
 			throw new Exception("Unexpected inconsistency in options");
 		}
 
-		let specialKey = options["statsKey"];
+		if specialKey == "" {
+			throw new Exception("Cached keys need to be enabled to use this function (options['statsKey'] == '_PHCR')!");
+		}
 
 		/**
 		* Get the key from redis
 		*/
 		let keys = redis->sMembers(specialKey);
-		if typeof keys == "array" {
-			for key, value in keys {
-				if prefix && !starts_with(value, prefix) {
-					unset(keys[key]);
-				}
+		if typeof keys != "array" {
+			return [];
+		}
+
+		for idx, key in keys {
+			if !empty prefix && !starts_with(key, prefix) {
+				unset keys[idx];
 			}
 		}
 
@@ -347,8 +366,7 @@ class Redis extends Backend implements BackendInterface
 	 * Checks if cache exists and it isn't expired
 	 *
 	 * @param string keyName
-	 * @param   long lifetime
-	 * @return boolean
+	 * @param int lifetime
 	 */
 	public function exists(keyName = null, lifetime = null) -> boolean
 	{
@@ -368,10 +386,7 @@ class Redis extends Backend implements BackendInterface
 				let redis = this->_redis;
 			}
 
-			if !redis->get(lastKey) {
-				return false;
-			}
-			return true;
+			return redis->exists(lastKey);
 		}
 
 		return false;
@@ -380,11 +395,9 @@ class Redis extends Backend implements BackendInterface
 	/**
 	 * Increment of given $keyName by $value
 	 *
-	 * @param  string keyName
-	 * @param  long lifetime
-	 * @return long
+	 * @param string keyName
 	 */
-	public function increment(keyName = null, value = null)
+	public function increment(keyName = null, int value = 1) -> int
 	{
 		var redis, prefix, lastKey;
 
@@ -401,10 +414,6 @@ class Redis extends Backend implements BackendInterface
 			let prefix = this->_prefix;
 			let lastKey = "_PHCR" . prefix . keyName;
 			let this->_lastKey = lastKey;
-		}
-
-		if !value {
-			let value = 1;
 		}
 
 		return redis->incrBy(lastKey, value);
@@ -413,11 +422,9 @@ class Redis extends Backend implements BackendInterface
 	/**
 	 * Decrement of $keyName by given $value
 	 *
-	 * @param  string keyName
-	 * @param  long value
-	 * @return long
+	 * @param string keyName
 	 */
-	public function decrement(keyName = null, value = null)
+	public function decrement(keyName = null, int value = 1) -> int
 	{
 		var redis, prefix, lastKey;
 
@@ -434,10 +441,6 @@ class Redis extends Backend implements BackendInterface
 			let prefix = this->_prefix;
 			let lastKey = "_PHCR" . prefix . keyName;
 			let this->_lastKey = lastKey;
-		}
-
-		if !value {
-			let value = 1;
 		}
 
 		return redis->decrBy(lastKey, value);
@@ -452,17 +455,19 @@ class Redis extends Backend implements BackendInterface
 
 		let options = this->_options;
 
-		if !isset options["statsKey"] {
+		if !fetch specialKey, options["statsKey"] {
 			throw new Exception("Unexpected inconsistency in options");
 		}
-
-		let specialKey = options["statsKey"];
 
 		let redis = this->_redis;
 
 		if typeof redis != "object" {
 			this->_connect();
 			let redis = this->_redis;
+		}
+
+		if specialKey == "" {
+			throw new Exception("Cached keys need to be enabled to use this function (options['statsKey'] == '_PHCR')!");
 		}
 
 		let keys = redis->sMembers(specialKey);

@@ -31,29 +31,33 @@
  * Phalcon\Db is an abstract class. You only can use it with a database adapter like Phalcon\Db\Adapter\Pdo
  *
  *<code>
- *use Phalcon\Db;
- *use Phalcon\Db\Exception;
- *use Phalcon\Db\Adapter\Pdo\Mysql as MysqlConnection;
+ * use Phalcon\Db;
+ * use Phalcon\Db\Exception;
+ * use Phalcon\Db\Adapter\Pdo\Mysql as MysqlConnection;
  *
- *try {
+ * try {
+ *     $connection = new MysqlConnection(
+ *         [
+ *             "host"     => "192.168.0.11",
+ *             "username" => "sigma",
+ *             "password" => "secret",
+ *             "dbname"   => "blog",
+ *             "port"     => "3306",
+ *         ]
+ *     );
  *
- *  $connection = new MysqlConnection(array(
- *     'host' => '192.168.0.11',
- *     'username' => 'sigma',
- *     'password' => 'secret',
- *     'dbname' => 'blog',
- *     'port' => '3306',
- *  ));
+ *     $result = $connection->query(
+ *         "SELECT * FROM robots LIMIT 5"
+ *     );
  *
- *  $result = $connection->query("SELECT * FROM robots LIMIT 5");
- *  $result->setFetchMode(Db::FETCH_NUM);
- *  while ($robot = $result->fetch()) {
- *    print_r($robot);
- *  }
+ *     $result->setFetchMode(Db::FETCH_NUM);
  *
- *} catch (Exception $e) {
- *	echo $e->getMessage(), PHP_EOL;
- *} 
+ *     while ($robot = $result->fetch()) {
+ *         print_r($robot);
+ *     }
+ * } catch (Exception $e) {
+ *     echo $e->getMessage(), PHP_EOL;
+ * }
  * </code>
  */
 ZEPHIR_INIT_CLASS(Phalcon_Db) {
@@ -103,14 +107,13 @@ ZEPHIR_INIT_CLASS(Phalcon_Db) {
  */
 PHP_METHOD(Phalcon_Db, setup) {
 
-	zval *options_param = NULL, *escapeIdentifiers, *forceCasting;
+	zval *options_param = NULL, *escapeIdentifiers = NULL, *forceCasting = NULL;
 	zval *options = NULL;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 1, 0, &options_param);
 
 	options = options_param;
-
 
 
 	ZEPHIR_OBS_VAR(escapeIdentifiers);
